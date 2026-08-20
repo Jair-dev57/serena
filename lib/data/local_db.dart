@@ -43,4 +43,24 @@ class LocalDb {
     final maps = await db.query('practice_sessions', orderBy: 'date DESC');
     return maps.map((m) => PracticeSession.fromMap(m)).toList();
   }
+
+  Future<int> getCurrentStreak() async {
+    final sessions = await getAllSessions();
+    if (sessions.isEmpty) return 0;
+
+    final days = sessions
+        .map((s) => DateTime(s.date.year, s.date.month, s.date.day))
+        .toSet();
+
+    int streak = 0;
+    DateTime cursor = DateTime.now();
+    cursor = DateTime(cursor.year, cursor.month, cursor.day);
+
+    while (days.contains(cursor)) {
+      streak++;
+      cursor = cursor.subtract(const Duration(days: 1));
+    }
+
+    return streak;
+  }
 }
