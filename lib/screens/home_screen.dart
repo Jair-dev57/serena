@@ -15,18 +15,60 @@ class HomeScreen extends StatelessWidget {
     }
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Serena'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.show_chart),
-            onPressed: () {
-              Navigator.of(context).push(
-                MaterialPageRoute(builder: (context) => const ProgressScreen()),
-              );
-            },
-          ),
-        ],
+      appBar: AppBar(title: const Text('Serena')),
+      drawer: Drawer(
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: [
+            DrawerHeader(
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.primaryContainer,
+              ),
+              child: const Align(
+                alignment: Alignment.bottomLeft,
+                child: Text(
+                  'Serena',
+                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                ),
+              ),
+            ),
+            ListTile(
+              leading: const Icon(Icons.fitness_center),
+              title: const Text('Ejercicios'),
+              onTap: () => Navigator.of(context).pop(),
+            ),
+            ListTile(
+              leading: const Icon(Icons.show_chart),
+              title: const Text('Mi progreso'),
+              onTap: () {
+                Navigator.of(context).pop();
+                Navigator.of(context).push(
+                  MaterialPageRoute(builder: (context) => const ProgressScreen()),
+                );
+              },
+            ),
+            const Divider(),
+            ListTile(
+              leading: const Icon(Icons.book_outlined),
+              title: const Text('Diario de bloqueos'),
+              subtitle: const Text('Próximamente'),
+              enabled: false,
+            ),
+            ListTile(
+              leading: const Icon(Icons.spellcheck),
+              title: const Text('Palabras difíciles'),
+              subtitle: const Text('Próximamente'),
+              enabled: false,
+            ),
+            const Divider(),
+            ListTile(
+              leading: const Icon(Icons.settings_outlined),
+              title: const Text('Ajustes'),
+              subtitle: const Text('Próximamente'),
+              enabled: false,
+            ),
+          ],
+        ),
       ),
       body: ListView(
         children: [
@@ -39,16 +81,19 @@ class HomeScreen extends StatelessWidget {
               ),
             ),
             for (final exercise in grouped[category]!)
-              ListTile(
-                title: Text(exercise.title),
-                subtitle: Text(exercise.description),
-                onTap: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (context) => ExerciseDetailScreen(exercise: exercise),
-                    ),
-                  );
-                },
+              Card(
+                child: ListTile(
+                  title: Text(exercise.title),
+                  subtitle: Text(exercise.description),
+                  trailing: const Icon(Icons.chevron_right),
+                  onTap: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) => ExerciseDetailScreen(exercise: exercise),
+                      ),
+                    );
+                  },
+                ),
               ),
           ],
         ],
