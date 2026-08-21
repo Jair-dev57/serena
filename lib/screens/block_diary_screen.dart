@@ -36,6 +36,31 @@ class _BlockDiaryScreenState extends State<BlockDiaryScreen> {
     _loadEntries();
   }
 
+  Future<bool> _confirmDelete(BlockEntry entry) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) {
+        return AlertDialog(
+          title: const Text('¿Eliminar registro?'),
+          content: Text(
+            '¿Seguro que quieres eliminar este bloqueo (${entry.severity.label} · ${entry.context.label})?',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext, false),
+              child: const Text('Cancelar'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext, true),
+              child: const Text('Eliminar'),
+            ),
+          ],
+        );
+      },
+    );
+    return confirmed ?? false;
+  }
+
   Future<void> _deleteEntry(int id) async {
     await LocalDb.instance.deleteBlockEntry(id);
     _loadEntries();
@@ -148,6 +173,7 @@ class _BlockDiaryScreenState extends State<BlockDiaryScreen> {
                 return Dismissible(
                   key: ValueKey(entry.id),
                   direction: DismissDirection.endToStart,
+                  confirmDismiss: (_) => _confirmDelete(entry),
                   background: Container(
                     color: Colors.red,
                     alignment: Alignment.centerRight,
