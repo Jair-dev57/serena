@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import '../data/local_db.dart';
 import '../models/exercise.dart';
-import 'dart:async';
 import '../data/exercises_data.dart';
 import 'exercise_detail_screen.dart';
 
@@ -16,7 +15,6 @@ class DifficultWordsScreen extends StatefulWidget {
 
 class _DifficultWordsScreenState extends State<DifficultWordsScreen> {
   List<DifficultWord> _words = [];
-  Timer? _undoTimer;
   bool _isSearching = false;
   String _searchQuery = '';
   final TextEditingController _searchController = TextEditingController();
@@ -30,7 +28,6 @@ class _DifficultWordsScreenState extends State<DifficultWordsScreen> {
 
   @override
   void dispose() {
-    _undoTimer?.cancel();
     _searchController.dispose();
     super.dispose();
   }
@@ -52,40 +49,32 @@ class _DifficultWordsScreenState extends State<DifficultWordsScreen> {
     _loadWords();
   }
 
-  void _handleDismiss(DifficultWord word) async {
-    final realIndex = _words.indexWhere((w) => w.id == word.id);
-    if (realIndex == -1) return;
-
-    setState(() {
-      _words.removeAt(realIndex);
-    });
-
-    await LocalDb.instance.deleteWord(word.id!);
-
-    if (!mounted) return;
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('"${word.word}" eliminada'),
-        duration: const Duration(days: 1),
-        action: SnackBarAction(
-          label: 'Deshacer',
-          onPressed: () async {
-            _undoTimer?.cancel();
-            final restored = DifficultWord(word: word.word, dateAdded: word.dateAdded, note: word.note);
-            await LocalDb.instance.insertWord(restored);
-            _loadWords();
-          },
-        ),
-      ),
+  Future<bool> _confirmDelete(DifficultWord word) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) {
+        return AlertDialog(
+          title: const Text('¿Eliminar palabra?'),
+          content: Text('¿Seguro que quieres eliminar "${word.word}"?'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext, false),
+              child: const Text('Cancelar'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext, true),
+              child: const Text('Eliminar'),
+            ),
+          ],
+        );
+      },
     );
+    return confirmed ?? false;
+  }
 
-    _undoTimer?.cancel();
-    _undoTimer = Timer(const Duration(seconds: 3), () {
-      if (mounted) {
-        ScaffoldMessenger.of(context).removeCurrentSnackBar();
-      }
-    });
+  void _handleDismiss(DifficultWord word) async {
+    await LocalDb.instance.deleteWord(word.id!);
+    _loadWords();
   }
 
   void _showEditDialog(DifficultWord word) {
@@ -315,6 +304,7 @@ class _DifficultWordsScreenState extends State<DifficultWordsScreen> {
                 return Dismissible(
                   key: ValueKey(word.id),
                   direction: DismissDirection.endToStart,
+                  confirmDismiss: (_) => _confirmDelete(word),
                   background: Container(
                     color: Colors.red,
                     alignment: Alignment.centerRight,
