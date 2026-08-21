@@ -4,6 +4,7 @@ import '../models/exercise.dart';
 import 'exercise_detail_screen.dart';
 import 'progress_screen.dart';
 import 'difficult_words_screen.dart';
+import 'block_diary_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -52,8 +53,12 @@ class HomeScreen extends StatelessWidget {
             ListTile(
               leading: const Icon(Icons.book_outlined),
               title: const Text('Diario de bloqueos'),
-              subtitle: const Text('Próximamente'),
-              enabled: false,
+              onTap: () {
+                Navigator.of(context).pop();
+                Navigator.of(context).push(
+                  MaterialPageRoute(builder: (context) => const BlockDiaryScreen()),
+                );
+              },
             ),
             ListTile(
               leading: const Icon(Icons.spellcheck),

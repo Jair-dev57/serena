@@ -18,7 +18,7 @@ class LocalDb {
     final path = join(dbPath, 'fluidez_app.db');
     return openDatabase(
       path,
-      version: 3,
+      version: 4,
       onCreate: (db, version) async {
         await db.execute('''
           CREATE TABLE practice_sessions (
@@ -35,6 +35,15 @@ class LocalDb {
             note TEXT
           )
         ''');
+        await db.execute('''
+          CREATE TABLE block_entries (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            dateTime TEXT NOT NULL,
+            severity TEXT NOT NULL,
+            context TEXT NOT NULL,
+            note TEXT
+          )
+        ''');
       },
       onUpgrade: (db, oldVersion, newVersion) async {
         if (oldVersion < 2) {
@@ -48,6 +57,17 @@ class LocalDb {
         }
         if (oldVersion < 3) {
           await db.execute('ALTER TABLE difficult_words ADD COLUMN note TEXT');
+        }
+        if (oldVersion < 4) {
+          await db.execute('''
+            CREATE TABLE block_entries (
+              id INTEGER PRIMARY KEY AUTOINCREMENT,
+              dateTime TEXT NOT NULL,
+              severity TEXT NOT NULL,
+              context TEXT NOT NULL,
+              note TEXT
+            )
+          ''');
         }
       },
     );
@@ -104,5 +124,21 @@ class LocalDb {
       where: 'id = ?',
       whereArgs: [word.id],
     );
+  }
+
+  Future<void> insertBlockEntry(BlockEntry entry) async {
+    final db = await database;
+    await db.insert('block_entries', entry.toMap()..remove('id'));
+  }
+
+  Future<List<BlockEntry>> getAllBlockEntries() async {
+    final db = await database;
+    final maps = await db.query('block_entries', orderBy: 'dateTime DESC');
+    return maps.map((m) => BlockEntry.fromMap(m)).toList();
+  }
+
+  Future<void> deleteBlockEntry(int id) async {
+    final db = await database;
+    await db.delete('block_entries', where: 'id = ?', whereArgs: [id]);
   }
 }

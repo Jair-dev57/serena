@@ -95,3 +95,76 @@ class DifficultWord {
     );
   }
 }
+
+
+enum BlockSeverity { leve, moderado, fuerte }
+
+extension BlockSeverityLabel on BlockSeverity {
+  String get label {
+    switch (this) {
+      case BlockSeverity.leve:
+        return 'Leve';
+      case BlockSeverity.moderado:
+        return 'Moderado';
+      case BlockSeverity.fuerte:
+        return 'Fuerte';
+    }
+  }
+}
+
+enum BlockContext { llamada, publico, desconocidos, conocidos, trabajoEscuela, otro }
+
+extension BlockContextLabel on BlockContext {
+  String get label {
+    switch (this) {
+      case BlockContext.llamada:
+        return 'En llamada';
+      case BlockContext.publico:
+        return 'Hablando en público';
+      case BlockContext.desconocidos:
+        return 'Con desconocidos';
+      case BlockContext.conocidos:
+        return 'Con conocidos';
+      case BlockContext.trabajoEscuela:
+        return 'Trabajo/escuela';
+      case BlockContext.otro:
+        return 'Otro';
+    }
+  }
+}
+
+class BlockEntry {
+  final int? id;
+  final DateTime dateTime;
+  final BlockSeverity severity;
+  final BlockContext context;
+  final String? note;
+
+  const BlockEntry({
+    this.id,
+    required this.dateTime,
+    required this.severity,
+    required this.context,
+    this.note,
+  });
+
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'dateTime': dateTime.toIso8601String(),
+      'severity': severity.name,
+      'context': context.name,
+      'note': note,
+    };
+  }
+
+  factory BlockEntry.fromMap(Map<String, dynamic> map) {
+    return BlockEntry(
+      id: map['id'] as int?,
+      dateTime: DateTime.parse(map['dateTime'] as String),
+      severity: BlockSeverity.values.byName(map['severity'] as String),
+      context: BlockContext.values.byName(map['context'] as String),
+      note: map['note'] as String?,
+    );
+  }
+}
