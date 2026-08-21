@@ -62,3 +62,36 @@ class PracticeSession {
     );
   }
 }
+
+
+class DifficultWord {
+  final int? id;
+  final String word;
+  final DateTime dateAdded;
+  final String? note;
+
+  const DifficultWord({
+    this.id,
+    required this.word,
+    required this.dateAdded,
+    this.note,
+  });
+
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'word': word,
+      'dateAdded': dateAdded.toIso8601String(),
+      'note': note,
+    };
+  }
+
+  factory DifficultWord.fromMap(Map<String, dynamic> map) {
+    return DifficultWord(
+      id: map['id'] as int?,
+      word: map['word'] as String,
+      dateAdded: DateTime.parse(map['dateAdded'] as String),
+      note: map['note'] as String?,
+    );
+  }
+}

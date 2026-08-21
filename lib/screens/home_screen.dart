@@ -3,6 +3,7 @@ import '../data/exercises_data.dart';
 import '../models/exercise.dart';
 import 'exercise_detail_screen.dart';
 import 'progress_screen.dart';
+import 'difficult_words_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -57,8 +58,12 @@ class HomeScreen extends StatelessWidget {
             ListTile(
               leading: const Icon(Icons.spellcheck),
               title: const Text('Palabras difíciles'),
-              subtitle: const Text('Próximamente'),
-              enabled: false,
+              onTap: () {
+                Navigator.of(context).pop();
+                Navigator.of(context).push(
+                  MaterialPageRoute(builder: (context) => const DifficultWordsScreen()),
+                );
+              },
             ),
             const Divider(),
             ListTile(
