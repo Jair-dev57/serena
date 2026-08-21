@@ -5,6 +5,8 @@ import 'dart:async';
 import '../data/exercises_data.dart';
 import 'exercise_detail_screen.dart';
 
+enum WordSortOption { recent, oldest, alphabetical }
+
 class DifficultWordsScreen extends StatefulWidget {
   const DifficultWordsScreen({super.key});
 
@@ -18,6 +20,7 @@ class _DifficultWordsScreenState extends State<DifficultWordsScreen> {
   bool _isSearching = false;
   String _searchQuery = '';
   final TextEditingController _searchController = TextEditingController();
+  WordSortOption _sortOption = WordSortOption.recent;
 
   @override
   void initState() {
@@ -222,9 +225,22 @@ class _DifficultWordsScreenState extends State<DifficultWordsScreen> {
   }
 
   List<DifficultWord> get _filteredWords {
-    if (_searchQuery.isEmpty) return _words;
-    final query = _searchQuery.toLowerCase();
-    return _words.where((w) => w.word.toLowerCase().contains(query)).toList();
+    List<DifficultWord> result = _words;
+    if (_searchQuery.isNotEmpty) {
+      final query = _searchQuery.toLowerCase();
+      result = result.where((w) => w.word.toLowerCase().contains(query)).toList();
+    }
+
+    final sorted = List<DifficultWord>.from(result);
+    switch (_sortOption) {
+      case WordSortOption.recent:
+        sorted.sort((a, b) => b.dateAdded.compareTo(a.dateAdded));
+      case WordSortOption.oldest:
+        sorted.sort((a, b) => a.dateAdded.compareTo(b.dateAdded));
+      case WordSortOption.alphabetical:
+        sorted.sort((a, b) => a.word.toLowerCase().compareTo(b.word.toLowerCase()));
+    }
+    return sorted;
   }
 
   @override
@@ -259,6 +275,28 @@ class _DifficultWordsScreenState extends State<DifficultWordsScreen> {
                 _isSearching = !_isSearching;
               });
             },
+          ),
+          PopupMenuButton<WordSortOption>(
+            icon: const Icon(Icons.sort),
+            onSelected: (option) {
+              setState(() {
+                _sortOption = option;
+              });
+            },
+            itemBuilder: (context) => const [
+              PopupMenuItem(
+                value: WordSortOption.recent,
+                child: Text('Más reciente'),
+              ),
+              PopupMenuItem(
+                value: WordSortOption.oldest,
+                child: Text('Más antiguo'),
+              ),
+              PopupMenuItem(
+                value: WordSortOption.alphabetical,
+                child: Text('Alfabético'),
+              ),
+            ],
           ),
         ],
       ),
