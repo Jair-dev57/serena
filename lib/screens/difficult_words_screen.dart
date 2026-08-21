@@ -160,13 +160,22 @@ class _DifficultWordsScreenState extends State<DifficultWordsScreen> {
             ),
             TextButton(
               onPressed: () {
-                if (wordController.text.trim().isNotEmpty) {
-                  final noteText = noteController.text.trim();
-                  _addWord(
-                    wordController.text.trim(),
-                    noteText.isEmpty ? null : noteText,
-                  );
+                final text = wordController.text.trim();
+                if (text.isEmpty) {
+                  Navigator.pop(dialogContext);
+                  return;
                 }
+                final isDuplicate = _words.any(
+                  (w) => w.word.toLowerCase() == text.toLowerCase(),
+                );
+                if (isDuplicate) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Esa palabra ya está en tu lista.')),
+                  );
+                  return;
+                }
+                final noteText = noteController.text.trim();
+                _addWord(text, noteText.isEmpty ? null : noteText);
                 Navigator.pop(dialogContext);
               },
               child: const Text('Guardar'),
