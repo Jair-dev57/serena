@@ -137,6 +137,16 @@ class LocalDb {
     return maps.map((m) => BlockEntry.fromMap(m)).toList();
   }
 
+  Future<void> updateBlockEntry(BlockEntry entry) async {
+    final db = await database;
+    await db.update(
+      'block_entries',
+      entry.toMap(),
+      where: 'id = ?',
+      whereArgs: [entry.id],
+    );
+  }
+
   Future<void> deleteBlockEntry(int id) async {
     final db = await database;
     await db.delete('block_entries', where: 'id = ?', whereArgs: [id]);

@@ -66,6 +66,104 @@ class _BlockDiaryScreenState extends State<BlockDiaryScreen> {
     _loadEntries();
   }
 
+  void _showEditSheet(BlockEntry entry) {
+    BlockSeverity selectedSeverity = entry.severity;
+    BlockContext selectedContext = entry.context;
+    final noteController = TextEditingController(text: entry.note ?? '');
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      builder: (bottomSheetContext) {
+        return StatefulBuilder(
+          builder: (context, setSheetState) {
+            return Padding(
+              padding: EdgeInsets.only(
+                left: 16,
+                right: 16,
+                top: 16,
+                bottom: MediaQuery.of(context).viewInsets.bottom + 16,
+              ),
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('Editar bloqueo', style: Theme.of(context).textTheme.titleLarge),
+                    const SizedBox(height: 16),
+                    const Text('Severidad'),
+                    const SizedBox(height: 8),
+                    Wrap(
+                      spacing: 8,
+                      children: BlockSeverity.values.map((severity) {
+                        return ChoiceChip(
+                          label: Text(severity.label),
+                          selected: selectedSeverity == severity,
+                          onSelected: (_) {
+                            setSheetState(() {
+                              selectedSeverity = severity;
+                            });
+                          },
+                        );
+                      }).toList(),
+                    ),
+                    const SizedBox(height: 16),
+                    const Text('Contexto'),
+                    const SizedBox(height: 8),
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: BlockContext.values.map((ctx) {
+                        return ChoiceChip(
+                          label: Text(ctx.label),
+                          selected: selectedContext == ctx,
+                          onSelected: (_) {
+                            setSheetState(() {
+                              selectedContext = ctx;
+                            });
+                          },
+                        );
+                      }).toList(),
+                    ),
+                    const SizedBox(height: 16),
+                    TextField(
+                      controller: noteController,
+                      decoration: const InputDecoration(
+                        hintText: 'Nota (opcional)',
+                        border: OutlineInputBorder(),
+                      ),
+                      maxLines: 2,
+                    ),
+                    const SizedBox(height: 16),
+                    SizedBox(
+                      width: double.infinity,
+                      child: FilledButton(
+                        onPressed: () async {
+                          final noteText = noteController.text.trim();
+                          final updated = BlockEntry(
+                            id: entry.id,
+                            dateTime: entry.dateTime,
+                            severity: selectedSeverity,
+                            context: selectedContext,
+                            note: noteText.isEmpty ? null : noteText,
+                          );
+                          await LocalDb.instance.updateBlockEntry(updated);
+                          _loadEntries();
+                          Navigator.pop(bottomSheetContext);
+                        },
+                        child: const Text('Guardar cambios'),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
   void _showAddSheet() {
     BlockSeverity selectedSeverity = BlockSeverity.leve;
     BlockContext selectedContext = BlockContext.llamada;
@@ -188,7 +286,9 @@ class _BlockDiaryScreenState extends State<BlockDiaryScreen> {
                           ? '${entry.dateTime.day}/${entry.dateTime.month}/${entry.dateTime.year} · ${entry.note}'
                           : '${entry.dateTime.day}/${entry.dateTime.month}/${entry.dateTime.year}',
                     ),
+                    onLongPress: () => _showEditSheet(entry),
                   ),
+                  
                 );
               },
             ),
