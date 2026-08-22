@@ -48,4 +48,24 @@ class ExercisePathLogic {
     final previousExercises = exercisesByCategory[previousCategory] ?? [];
     return isCategoryCompleted(previousExercises, progressById);
   }
+
+  /// El primer ejercicio desbloqueado que aún no se ha completado ninguna vez,
+  /// recorriendo las categorías en orden. Si todo está completado, devuelve null.
+  static Exercise? nextRecommendedExercise(
+    List<Exercise> allExercises,
+    List<ExerciseCategory> orderedCategories,
+    Map<String, ExerciseProgress> progressById,
+  ) {
+    for (final category in orderedCategories) {
+      final categoryExercises = exercisesForCategory(allExercises, category);
+      for (final exercise in categoryExercises) {
+        final unlocked = isUnlocked(exercise, categoryExercises, progressById);
+        if (!unlocked) break; // el resto de la sección tampoco está desbloqueado
+        final progress = progressById[exercise.id];
+        final completed = progress != null && progress.timesCompleted >= 1;
+        if (!completed) return exercise;
+      }
+    }
+    return null; // todo completado
+  }
 }

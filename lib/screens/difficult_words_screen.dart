@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../data/local_db.dart';
 import '../models/exercise.dart';
 import '../data/exercises_data.dart';
+import '../data/exercise_path_logic.dart';
 import 'guided_exercise_screen.dart';
 
 enum WordSortOption { recent, oldest, alphabetical }
@@ -19,6 +20,13 @@ class _DifficultWordsScreenState extends State<DifficultWordsScreen> {
   String _searchQuery = '';
   final TextEditingController _searchController = TextEditingController();
   WordSortOption _sortOption = WordSortOption.recent;
+
+  static const List<ExerciseCategory> _orderedCategories = [
+    ExerciseCategory.respiracion,
+    ExerciseCategory.inicioSuave,
+    ExerciseCategory.ritmo,
+    ExerciseCategory.lectura,
+  ];
 
   @override
   void initState() {
@@ -186,7 +194,82 @@ class _DifficultWordsScreenState extends State<DifficultWordsScreen> {
     );
   }
 
-  void _showExercisePicker(DifficultWord word) {
+  Future<void> _practiceWord(DifficultWord word) async {
+    final allProgress = await LocalDb.instance.getAllProgress();
+    final progressById = {for (final p in allProgress) p.exerciseId: p};
+
+    final recommended = ExercisePathLogic.nextRecommendedExercise(
+      exercises,
+      _orderedCategories,
+      progressById,
+    );
+
+    if (recommended == null) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('¡Ya completaste todos los ejercicios de la ruta!')),
+      );
+      return;
+    }
+
+    if (!mounted) return;
+    _showExerciseSuggestion(word, recommended);
+  }
+
+  void _showExerciseSuggestion(DifficultWord word, Exercise recommended) {
+    showModalBottomSheet(
+      context: context,
+      builder: (bottomSheetContext) {
+        return SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Para practicar "${word.word}", te recomendamos:',
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+                const SizedBox(height: 12),
+                ListTile(
+                  contentPadding: EdgeInsets.zero,
+                  leading: const Icon(Icons.auto_awesome),
+                  title: Text(recommended.title),
+                  subtitle: Text('${recommended.category.label} · ${recommended.difficulty.label}'),
+                ),
+                const SizedBox(height: 8),
+                SizedBox(
+                  width: double.infinity,
+                  child: FilledButton(
+                    onPressed: () {
+                      Navigator.pop(bottomSheetContext);
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => GuidedExerciseScreen(exercise: recommended),
+                        ),
+                      );
+                    },
+                    child: const Text('Practicar este'),
+                  ),
+                ),
+                TextButton(
+                  onPressed: () {
+                    Navigator.pop(bottomSheetContext);
+                    _showAllExercisesPicker(word);
+                  },
+                  child: const Text('Ver todos los ejercicios'),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  void _showAllExercisesPicker(DifficultWord word) {
     showModalBottomSheet(
       context: context,
       builder: (bottomSheetContext) {
@@ -328,7 +411,7 @@ class _DifficultWordsScreenState extends State<DifficultWordsScreen> {
                           ? '${word.dateAdded.day}/${word.dateAdded.month}/${word.dateAdded.year} · ${word.note}'
                           : '${word.dateAdded.day}/${word.dateAdded.month}/${word.dateAdded.year}',
                     ),
-                    onTap: () => _showExercisePicker(word),
+                    onTap: () => _practiceWord(word),
                     onLongPress: () => _showEditDialog(word),
                   ),
                 );
