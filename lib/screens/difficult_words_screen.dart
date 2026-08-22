@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../data/local_db.dart';
 import '../models/exercise.dart';
 import '../data/exercises_data.dart';
-import 'exercise_detail_screen.dart';
+import 'guided_exercise_screen.dart';
 
 enum WordSortOption { recent, oldest, alphabetical }
 
@@ -210,7 +210,7 @@ class _DifficultWordsScreenState extends State<DifficultWordsScreen> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => ExerciseDetailScreen(exercise: exercise),
+                        builder: (context) => GuidedExerciseScreen(exercise: exercise),
                       ),
                     );
                   },

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'screens/home_screen.dart';
+import 'screens/route_screen.dart';
 
 final ValueNotifier<ThemeMode> themeModeNotifier = ValueNotifier(ThemeMode.system);
 
@@ -59,7 +59,7 @@ class MyApp extends StatelessWidget {
               margin: EdgeInsets.symmetric(horizontal: 16, vertical: 6),
             ),
           ),
-          home: const HomeScreen(),
+          home: const RouteScreen(),
         );
       },
     );

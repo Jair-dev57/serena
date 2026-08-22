@@ -195,3 +195,70 @@ class BlockEntry {
     );
   }
 }
+
+
+//Exercice Progression
+enum ExerciseRank { cobre, plata, oro, platino, diamante }
+
+extension ExerciseRankLabel on ExerciseRank {
+  String get label {
+    switch (this) {
+      case ExerciseRank.cobre:
+        return 'Cobre';
+      case ExerciseRank.plata:
+        return 'Plata';
+      case ExerciseRank.oro:
+        return 'Oro';
+      case ExerciseRank.platino:
+        return 'Platino';
+      case ExerciseRank.diamante:
+        return 'Diamante';
+    }
+  }
+}
+
+class ExerciseProgress {
+  final String exerciseId;
+  final int timesCompleted;
+  final DateTime? lastCompletedAt;
+
+  const ExerciseProgress({
+    required this.exerciseId,
+    required this.timesCompleted,
+    this.lastCompletedAt,
+  });
+
+  ExerciseRank get rank {
+    if (timesCompleted >= 15) return ExerciseRank.diamante;
+    if (timesCompleted >= 10) return ExerciseRank.platino;
+    if (timesCompleted >= 6) return ExerciseRank.oro;
+    if (timesCompleted >= 3) return ExerciseRank.plata;
+    return ExerciseRank.cobre;
+  }
+
+  int get repsToNextRank {
+    if (timesCompleted >= 15) return 0;
+    if (timesCompleted >= 10) return 15 - timesCompleted;
+    if (timesCompleted >= 6) return 10 - timesCompleted;
+    if (timesCompleted >= 3) return 6 - timesCompleted;
+    return 3 - timesCompleted;
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'exerciseId': exerciseId,
+      'timesCompleted': timesCompleted,
+      'lastCompletedAt': lastCompletedAt?.toIso8601String(),
+    };
+  }
+
+  factory ExerciseProgress.fromMap(Map<String, dynamic> map) {
+    return ExerciseProgress(
+      exerciseId: map['exerciseId'] as String,
+      timesCompleted: map['timesCompleted'] as int,
+      lastCompletedAt: map['lastCompletedAt'] != null
+          ? DateTime.parse(map['lastCompletedAt'] as String)
+          : null,
+    );
+  }
+}

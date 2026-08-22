@@ -1,0 +1,300 @@
+
+import 'package:flutter/material.dart';
+import '../data/exercises_data.dart';
+import '../data/local_db.dart';
+import '../data/exercise_path_logic.dart';
+import '../models/exercise.dart';
+import '../theme/app_styles.dart';
+import 'guided_exercise_screen.dart';
+import 'progress_screen.dart';
+import 'difficult_words_screen.dart';
+import 'block_diary_screen.dart';
+import 'settings_screen.dart';
+
+class RouteScreen extends StatefulWidget {
+  const RouteScreen({super.key});
+
+  @override
+  State<RouteScreen> createState() => _RouteScreenState();
+}
+
+class _RouteScreenState extends State<RouteScreen> {
+  Map<String, ExerciseProgress> _progressById = {};
+  bool _loading = true;
+
+  static const List<ExerciseCategory> _orderedCategories = [
+    ExerciseCategory.respiracion,
+    ExerciseCategory.inicioSuave,
+    ExerciseCategory.ritmo,
+    ExerciseCategory.lectura,
+  ];
+
+  @override
+  void initState() {
+    super.initState();
+    _loadProgress();
+  }
+
+  Future<void> _loadProgress() async {
+    final allProgress = await LocalDb.instance.getAllProgress();
+    setState(() {
+      _progressById = {for (final p in allProgress) p.exerciseId: p};
+      _loading = false;
+    });
+  }
+
+  Color _rankColor(ExerciseRank rank) {
+    switch (rank) {
+      case ExerciseRank.cobre:
+        return const Color(0xFFB5722C);
+      case ExerciseRank.plata:
+        return const Color(0xFF9AA0A6);
+      case ExerciseRank.oro:
+        return const Color(0xFFCF9A2E);
+      case ExerciseRank.platino:
+        return const Color(0xFF5B8DB8);
+      case ExerciseRank.diamante:
+        return const Color(0xFF3FBFB0);
+    }
+  }
+
+  Future<void> _openExercise(Exercise exercise) async {
+    final completed = await Navigator.push<bool>(
+      context,
+      MaterialPageRoute(
+        builder: (context) => GuidedExerciseScreen(exercise: exercise),
+      ),
+    );
+    if (completed == true) {
+      _loadProgress();
+    }
+  }
+
+  Widget _buildNode(Exercise exercise, bool unlocked, bool alignRight) {
+    final progress = _progressById[exercise.id];
+    final rank = progress?.rank ?? ExerciseRank.cobre;
+    final timesCompleted = progress?.timesCompleted ?? 0;
+
+    Widget node;
+    if (!unlocked) {
+      node = Container(
+        width: 60,
+        height: 60,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          color: Theme.of(context).colorScheme.surfaceContainerHighest,
+        ),
+        child: Icon(
+          Icons.lock_outline,
+          color: Theme.of(context).colorScheme.onSurfaceVariant,
+        ),
+      );
+    } else {
+      final color = timesCompleted > 0 ? _rankColor(rank) : Theme.of(context).colorScheme.primary;
+      node = Container(
+        width: 64,
+        height: 64,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          color: color,
+        ),
+        child: Icon(
+          timesCompleted > 0 ? Icons.check : Icons.play_arrow,
+          color: Colors.white,
+          size: 28,
+        ),
+      );
+    }
+
+    return Padding(
+      padding: EdgeInsets.only(
+        left: alignRight ? 70 : 0,
+        right: alignRight ? 0 : 70,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          InkWell(
+            onTap: unlocked ? () => _openExercise(exercise) : null,
+            customBorder: const CircleBorder(),
+            child: node,
+          ),
+          const SizedBox(height: 6),
+          SizedBox(
+            width: 90,
+            child: Text(
+              exercise.title,
+              textAlign: TextAlign.center,
+              style: Theme.of(context).textTheme.bodySmall,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+          if (unlocked && timesCompleted > 0)
+            Text(
+              rank.label,
+              style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                    color: _rankColor(rank),
+                    fontWeight: FontWeight.bold,
+                  ),
+            ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCategorySection(ExerciseCategory category, bool categoryUnlocked) {
+    final categoryExercises = ExercisePathLogic.exercisesForCategory(exercises, category);
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 24),
+      child: Card(
+        elevation: 0,
+        color: Theme.of(context).colorScheme.surfaceContainerLow,
+        shape: AppStyles.cardShape(),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 20),
+          child: Column(
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  if (!categoryUnlocked)
+                    Icon(Icons.lock_outline, size: 18, color: Theme.of(context).colorScheme.onSurfaceVariant),
+                  if (!categoryUnlocked) const SizedBox(width: 6),
+                  Text(
+                    category.label,
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+              if (!categoryUnlocked)
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24),
+                  child: Text(
+                    'Completa la sección anterior para desbloquear esta.',
+                    textAlign: TextAlign.center,
+                    style: Theme.of(context).textTheme.bodySmall,
+                  ),
+                )
+              else
+                for (int i = 0; i < categoryExercises.length; i++) ...[
+                  _buildNode(
+                    categoryExercises[i],
+                    ExercisePathLogic.isUnlocked(categoryExercises[i], categoryExercises, _progressById),
+                    i.isOdd,
+                  ),
+                  if (i < categoryExercises.length - 1)
+                    Container(
+                      width: 2,
+                      height: 24,
+                      color: Theme.of(context).colorScheme.outlineVariant,
+                    ),
+                ],
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (_loading) {
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    }
+
+    final exercisesByCategory = <ExerciseCategory, List<Exercise>>{
+      for (final category in _orderedCategories)
+        category: ExercisePathLogic.exercisesForCategory(exercises, category),
+    };
+
+    return Scaffold(
+      appBar: AppBar(title: const Text('Serena')),
+      drawer: Drawer(
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: [
+            DrawerHeader(
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.primaryContainer,
+              ),
+              child: const Align(
+                alignment: Alignment.bottomLeft,
+                child: Text(
+                  'Serena',
+                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                ),
+              ),
+            ),
+            ListTile(
+              leading: const Icon(Icons.fitness_center),
+              title: const Text('Ruta de práctica'),
+              onTap: () => Navigator.of(context).pop(),
+            ),
+            ListTile(
+              leading: const Icon(Icons.show_chart),
+              title: const Text('Mi progreso'),
+              onTap: () {
+                Navigator.of(context).pop();
+                Navigator.of(context).push(
+                  MaterialPageRoute(builder: (context) => const ProgressScreen()),
+                );
+              },
+            ),
+            const Divider(),
+            ListTile(
+              leading: const Icon(Icons.book_outlined),
+              title: const Text('Diario de bloqueos'),
+              onTap: () {
+                Navigator.of(context).pop();
+                Navigator.of(context).push(
+                  MaterialPageRoute(builder: (context) => const BlockDiaryScreen()),
+                );
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.spellcheck),
+              title: const Text('Palabras difíciles'),
+              onTap: () {
+                Navigator.of(context).pop();
+                Navigator.of(context).push(
+                  MaterialPageRoute(builder: (context) => const DifficultWordsScreen()),
+                );
+              },
+            ),
+            const Divider(),
+            ListTile(
+              leading: const Icon(Icons.settings_outlined),
+              title: const Text('Ajustes'),
+              onTap: () {
+                Navigator.of(context).pop();
+                Navigator.of(context).push(
+                  MaterialPageRoute(builder: (context) => const SettingsScreen()),
+                );
+              },
+            ),
+          ],
+        ),
+      ),
+      body: ListView(
+        padding: const EdgeInsets.all(16),
+        children: [
+          for (final category in _orderedCategories)
+            _buildCategorySection(
+              category,
+              ExercisePathLogic.isCategoryUnlocked(
+                category,
+                _orderedCategories,
+                exercisesByCategory,
+                _progressById,
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+}

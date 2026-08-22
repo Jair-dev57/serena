@@ -18,7 +18,7 @@ class LocalDb {
     final path = join(dbPath, 'fluidez_app.db');
     return openDatabase(
       path,
-      version: 4,
+      version: 5,
       onCreate: (db, version) async {
         await db.execute('''
           CREATE TABLE practice_sessions (
@@ -44,6 +44,13 @@ class LocalDb {
             note TEXT
           )
         ''');
+        await db.execute('''
+          CREATE TABLE exercise_progress (
+            exerciseId TEXT PRIMARY KEY,
+            timesCompleted INTEGER NOT NULL,
+            lastCompletedAt TEXT
+          )
+        ''');
       },
       onUpgrade: (db, oldVersion, newVersion) async {
         if (oldVersion < 2) {
@@ -66,6 +73,15 @@ class LocalDb {
               severity TEXT NOT NULL,
               context TEXT NOT NULL,
               note TEXT
+            )
+          ''');
+        }
+        if (oldVersion < 5) {
+          await db.execute('''
+            CREATE TABLE exercise_progress (
+              exerciseId TEXT PRIMARY KEY,
+              timesCompleted INTEGER NOT NULL,
+              lastCompletedAt TEXT
             )
           ''');
         }
@@ -150,5 +166,47 @@ class LocalDb {
   Future<void> deleteBlockEntry(int id) async {
     final db = await database;
     await db.delete('block_entries', where: 'id = ?', whereArgs: [id]);
+  }
+
+  Future<ExerciseProgress?> getProgressForExercise(String exerciseId) async {
+    final db = await database;
+    final maps = await db.query(
+      'exercise_progress',
+      where: 'exerciseId = ?',
+      whereArgs: [exerciseId],
+    );
+    if (maps.isEmpty) return null;
+    return ExerciseProgress.fromMap(maps.first);
+  }
+
+  Future<List<ExerciseProgress>> getAllProgress() async {
+    final db = await database;
+    final maps = await db.query('exercise_progress');
+    return maps.map((m) => ExerciseProgress.fromMap(m)).toList();
+  }
+
+  Future<void> incrementProgress(String exerciseId) async {
+    final db = await database;
+    final existing = await getProgressForExercise(exerciseId);
+    if (existing == null) {
+      final progress = ExerciseProgress(
+        exerciseId: exerciseId,
+        timesCompleted: 1,
+        lastCompletedAt: DateTime.now(),
+      );
+      await db.insert('exercise_progress', progress.toMap());
+    } else {
+      final updated = ExerciseProgress(
+        exerciseId: exerciseId,
+        timesCompleted: existing.timesCompleted + 1,
+        lastCompletedAt: DateTime.now(),
+      );
+      await db.update(
+        'exercise_progress',
+        updated.toMap(),
+        where: 'exerciseId = ?',
+        whereArgs: [exerciseId],
+      );
+    }
   }
 }
