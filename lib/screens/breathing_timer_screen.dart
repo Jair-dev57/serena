@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../data/local_db.dart';
 import '../models/exercise.dart';
 import '../theme/app_styles.dart';
+import '../widgets/step_card.dart';
 
 class BreathingTimerScreen extends StatefulWidget {
   final Exercise exercise;
@@ -15,7 +16,7 @@ class BreathingTimerScreen extends StatefulWidget {
 
 class _BreathingTimerScreenState extends State<BreathingTimerScreen>
     with SingleTickerProviderStateMixin {
-  static const List<int> _durationOptions = [3, 5, 7, 10];
+  static const List<int> _durationOptions = [2, 3, 5, 7, 10];
 
   int? _selectedMinutes;
   bool _running = false;
@@ -184,57 +185,53 @@ class _BreathingTimerScreenState extends State<BreathingTimerScreen>
     }
 
     if (!_running) {
-    return Scaffold(
-      appBar: AppBar(title: Text(widget.exercise.title)),
-      body: Padding(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Expanded(
-              child: SingleChildScrollView(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      widget.exercise.description,
-                      style: Theme.of(context).textTheme.bodyLarge,
-                    ),
-                    const SizedBox(height: 20),
-                    Text(
-                      'Pasos',
-                      style: Theme.of(context).textTheme.titleMedium,
-                    ),
-                    const SizedBox(height: 8),
-                    for (final step in widget.exercise.steps)
-                      Padding(
-                        padding: const EdgeInsets.only(bottom: 12),
-                        child: Text(
-                          '•  $step',
-                          style: Theme.of(context).textTheme.bodyLarge,
-                        ),
+      return Scaffold(
+        appBar: AppBar(title: Text(widget.exercise.title)),
+        body: Padding(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                child: SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        widget.exercise.description,
+                        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                              color: Theme.of(context).colorScheme.onSurfaceVariant,
+                            ),
                       ),
-                    const SizedBox(height: 20),
-                    Text(
-                      'Elige cuánto quieres practicar',
-                      style: Theme.of(context).textTheme.titleMedium,
-                    ),
-              const SizedBox(height: 12),
-              Wrap(
-                spacing: 8,
-                children: _durationOptions.map((min) {
-                  return ChoiceChip(
-                    label: Text('$min min'),
-                    selected: _selectedMinutes == min,
-                    onSelected: (_) => setState(() => _selectedMinutes = min),
-                  );
-                }).toList(),
+                      const SizedBox(height: 20),
+                      Text(
+                        'Pasos',
+                        style: Theme.of(context).textTheme.titleMedium,
+                      ),
+                      const SizedBox(height: 10),
+                      for (int i = 0; i < widget.exercise.steps.length; i++)
+                        StepCard(number: i + 1, text: widget.exercise.steps[i]),
+                      const SizedBox(height: 20),
+                      Text(
+                        'Elige cuánto quieres practicar',
+                        style: Theme.of(context).textTheme.titleMedium,
+                      ),
+                      const SizedBox(height: 12),
+                      Wrap(
+                        spacing: 8,
+                        children: _durationOptions.map((min) {
+                          return ChoiceChip(
+                            label: Text('$min min'),
+                            selected: _selectedMinutes == min,
+                            onSelected: (_) => setState(() => _selectedMinutes = min),
+                          );
+                        }).toList(),
+                      ),
+                    ],
+                  ),
+                ),
               ),
-            ],
-          ),
-        ),
-      ),
-      const SizedBox(height: 16),
+              const SizedBox(height: 16),
               SizedBox(
                 width: double.infinity,
                 child: FilledButton(

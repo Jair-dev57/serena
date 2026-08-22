@@ -4,6 +4,8 @@ import '../models/exercise.dart';
 import '../theme/app_styles.dart';
 import '../widgets/recorder_widget.dart';
 import '../widgets/metronome_widget.dart';
+import '../widgets/step_card.dart';
+import '../widgets/repetition_tracker.dart';
 
 class GuidedExerciseScreen extends StatefulWidget {
   final Exercise exercise;
@@ -145,28 +147,45 @@ class _GuidedExerciseScreenState extends State<GuidedExerciseScreen>
                   children: [
                     Text(
                       widget.exercise.description,
-                      style: Theme.of(context).textTheme.bodyLarge,
+                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                            color: Theme.of(context).colorScheme.onSurfaceVariant,
+                          ),
                     ),
                     const SizedBox(height: 20),
                     Text(
                       'Pasos',
                       style: Theme.of(context).textTheme.titleMedium,
                     ),
-                    const SizedBox(height: 8),
-                    for (final step in widget.exercise.steps)
-                      Padding(
-                        padding: const EdgeInsets.only(bottom: 12),
-                        child: Text(
-                          '•  $step',
-                          style: Theme.of(context).textTheme.bodyLarge,
-                        ),
-                      ),
+                    const SizedBox(height: 10),
+                    for (int i = 0; i < widget.exercise.steps.length; i++)
+                      StepCard(number: i + 1, text: widget.exercise.steps[i]),
                     if (widget.exercise.id == 'ritmo_controlado') ...[
-                      const SizedBox(height: 12),
+                      const SizedBox(height: 16),
                       const MetronomeWidget(),
                     ],
-                    const SizedBox(height: 12),
-                    RecorderWidget(exerciseTitle: widget.exercise.title),
+                    const SizedBox(height: 20),
+                    Text(
+                      'Repeticiones',
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                    const SizedBox(height: 10),
+                    RepetitionTracker(
+                      onAllCompleted: () {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('¡Repeticiones completadas!')),
+                        );
+                      },
+                    ),
+                    const SizedBox(height: 20),
+                    Text(
+                      'Grabación',
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                    const SizedBox(height: 10),
+                    RecorderWidget(
+                      exerciseId: widget.exercise.id,
+                      exerciseTitle: widget.exercise.title,
+                    ),
                     const SizedBox(height: 24),
                   ],
                 ),
