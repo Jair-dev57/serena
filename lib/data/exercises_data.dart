@@ -2,6 +2,7 @@ import '../models/exercise.dart';
 
 final List<Exercise> exercises = [
   const Exercise(
+    id: 'respiracion_diafragmatica',
     title: 'Respiración diafragmática',
     category: ExerciseCategory.respiracion,
     description: 'Aprende a respirar desde el diafragma para dar soporte constante a tu voz.',
@@ -12,8 +13,12 @@ final List<Exercise> exercises = [
       'Exhala lentamente por la boca durante 6 segundos.',
       'Repite el ciclo 8 a 10 veces, sin forzar.',
     ],
+    difficulty: ExerciseDifficulty.principiante,
+    durationMinutes: 5,
+    tags: ['respiración', 'relajación', 'base'],
   ),
   const Exercise(
+    id: 'inicio_suave',
     title: 'Inicio suave de palabras',
     category: ExerciseCategory.inicioSuave,
     description: 'Practica comenzar palabras con un ataque vocal suave, reduciendo la tensión al iniciar el habla.',
@@ -24,8 +29,12 @@ final List<Exercise> exercises = [
       'Repite cada palabra 3 veces, bajando la tensión cada vez.',
       'Cuando te sientas cómodo, intenta lo mismo con frases cortas.',
     ],
+    difficulty: ExerciseDifficulty.principiante,
+    durationMinutes: 8,
+    tags: ['inicio suave', 'tensión', 'vocales'],
   ),
   const Exercise(
+    id: 'ritmo_controlado',
     title: 'Habla con ritmo controlado',
     category: ExerciseCategory.ritmo,
     description: 'Hablar despacio y con ritmo ayuda a reducir bloqueos.',
@@ -34,8 +43,12 @@ final List<Exercise> exercises = [
       'Cuando te sientas cómodo, arma frases cortas.',
       'Sube la velocidad poco a poco en sesiones futuras.',
     ],
+    difficulty: ExerciseDifficulty.intermedio,
+    durationMinutes: 10,
+    tags: ['ritmo', 'metrónomo', 'frases'],
   ),
   const Exercise(
+    id: 'lectura_guiada',
     title: 'Lectura en voz alta guiada',
     category: ExerciseCategory.lectura,
     description: 'Lee un texto corto aplicando respiración e inicio suave.',
@@ -44,5 +57,8 @@ final List<Exercise> exercises = [
       'Haz 3 respiraciones diafragmáticas antes de empezar.',
       'Lee en voz alta, sin detenerte si hay un bloqueo.',
     ],
+    difficulty: ExerciseDifficulty.avanzado,
+    durationMinutes: 12,
+    tags: ['lectura', 'integración', 'texto largo'],
   ),
 ];

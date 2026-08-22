@@ -20,20 +20,45 @@ extension ExerciseCategoryLabel on ExerciseCategory {
   }
 }
 
+// ExerciseDifficulty
+
+enum ExerciseDifficulty { principiante, intermedio, avanzado }
+extension ExerciseDifficultyLabel on ExerciseDifficulty {
+  String get label {
+    switch (this) {
+      case ExerciseDifficulty.principiante:
+        return 'Principiante';
+      case ExerciseDifficulty.intermedio:
+        return 'Intermedio';
+      case ExerciseDifficulty.avanzado:
+        return 'Avanzado';
+    }
+  }
+}
+
 class Exercise {
+  final String id;
   final String title;
   final ExerciseCategory category;
   final String description;
   final List<String> steps;
+  final ExerciseDifficulty difficulty;
+  final int durationMinutes;
+  final List<String> tags;
 
   const Exercise({
+    required this.id,
     required this.title,
     required this.category,
     required this.description,
     required this.steps,
+    required this.difficulty,
+    required this.durationMinutes,
+    this.tags = const [],
   });
 }
 
+// PracticeSession
 
 class PracticeSession {
   final int? id;
@@ -63,6 +88,8 @@ class PracticeSession {
   }
 }
 
+
+//Dificult Word
 
 class DifficultWord {
   final int? id;

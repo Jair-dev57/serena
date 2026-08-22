@@ -26,7 +26,7 @@ class ExerciseDetailScreen extends StatelessWidget {
             const SizedBox(height: 8),
             for (final step in exercise.steps) Text('• $step'),
             const SizedBox(height: 24),
-            if (exercise.title == 'Habla con ritmo controlado')
+            if (exercise.id == 'ritmo_controlado')
               const Center(child: MetronomeWidget()),
             Center(child: RecorderWidget(exerciseTitle: exercise.title)),
           ],
