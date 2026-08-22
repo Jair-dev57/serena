@@ -59,6 +59,10 @@ class _GuidedExerciseScreenState extends State<GuidedExerciseScreen>
       await LocalDb.instance.incrementProgress(widget.exercise.id);
       final after = await LocalDb.instance.getProgressForExercise(widget.exercise.id);
 
+      await LocalDb.instance.insertSession(
+        PracticeSession(exerciseTitle: widget.exercise.title, date: DateTime.now()),
+      );
+
       final previousRank = before?.rank;
       final newRank = after!.rank;
 

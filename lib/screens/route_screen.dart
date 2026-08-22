@@ -20,6 +20,7 @@ class RouteScreen extends StatefulWidget {
 class _RouteScreenState extends State<RouteScreen> {
   Map<String, ExerciseProgress> _progressById = {};
   bool _loading = true;
+  int _streak = 0;
 
   static const List<ExerciseCategory> _orderedCategories = [
     ExerciseCategory.respiracion,
@@ -36,8 +37,10 @@ class _RouteScreenState extends State<RouteScreen> {
 
   Future<void> _loadProgress() async {
     final allProgress = await LocalDb.instance.getAllProgress();
+    final streak = await LocalDb.instance.getCurrentStreak();
     setState(() {
       _progressById = {for (final p in allProgress) p.exerciseId: p};
+      _streak = streak;
       _loading = false;
     });
   }
@@ -313,6 +316,23 @@ class _RouteScreenState extends State<RouteScreen> {
                         style: Theme.of(context).textTheme.titleMedium?.copyWith(
                               color: Theme.of(context).colorScheme.onPrimaryContainer,
                               fontWeight: FontWeight.bold,
+                            ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 6),
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.local_fire_department,
+                        size: 18,
+                        color: Theme.of(context).colorScheme.onPrimaryContainer,
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        _streak == 1 ? '1 día de racha' : '$_streak días de racha',
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                              color: Theme.of(context).colorScheme.onPrimaryContainer,
                             ),
                       ),
                     ],
