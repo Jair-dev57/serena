@@ -314,3 +314,22 @@ class Recording {
     );
   }
 }
+
+
+// Warmup (pre-calentamiento para situaciones difíciles)
+
+enum WarmupStepType { cervical, lipTrill, humming, easyOnset }
+
+class WarmupStep {
+  final String title;
+  final String instruction;
+  final int durationSeconds;
+  final WarmupStepType type;
+
+  const WarmupStep({
+    required this.title,
+    required this.instruction,
+    required this.durationSeconds,
+    required this.type,
+  });
+}

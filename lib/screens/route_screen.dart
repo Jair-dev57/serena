@@ -9,6 +9,7 @@ import '../widgets/stat_chip.dart';
 import '../widgets/weekly_goal_card.dart';
 import 'guided_exercise_screen.dart';
 import 'breathing_timer_screen.dart';
+import 'warmup_screen.dart';
 import 'difficult_words_screen.dart';
 import 'block_diary_screen.dart';
 import 'settings_screen.dart';
@@ -348,6 +349,16 @@ class _RouteScreenState extends State<RouteScreen> {
               leading: const Icon(Icons.fitness_center),
               title: const Text('Ruta de práctica'),
               onTap: () => Navigator.of(context).pop(),
+            ),
+            ListTile(
+              leading: const Icon(Icons.spa_outlined),
+              title: const Text('Calentamiento'),
+              onTap: () {
+                Navigator.of(context).pop();
+                Navigator.of(context).push(
+                  MaterialPageRoute(builder: (context) => const WarmupScreen()),
+                );
+              },
             ),
             const Divider(),
             ListTile(
