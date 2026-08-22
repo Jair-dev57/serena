@@ -68,4 +68,12 @@ class ExercisePathLogic {
     }
     return null; // todo completado
   }
+
+  /// true si hay al menos un bloqueo "fuerte" en los últimos [days] días.
+  static bool hasRecentStrongBlock(List<BlockEntry> blockEntries, {int days = 3}) {
+    final cutoff = DateTime.now().subtract(Duration(days: days));
+    return blockEntries.any(
+      (e) => e.severity == BlockSeverity.fuerte && e.dateTime.isAfter(cutoff),
+    );
+  }
 }

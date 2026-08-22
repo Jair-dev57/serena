@@ -21,6 +21,7 @@ class _RouteScreenState extends State<RouteScreen> {
   Map<String, ExerciseProgress> _progressById = {};
   bool _loading = true;
   int _streak = 0;
+  bool _hasRecentStrongBlock = false;
 
   static const List<ExerciseCategory> _orderedCategories = [
     ExerciseCategory.respiracion,
@@ -38,9 +39,11 @@ class _RouteScreenState extends State<RouteScreen> {
   Future<void> _loadProgress() async {
     final allProgress = await LocalDb.instance.getAllProgress();
     final streak = await LocalDb.instance.getCurrentStreak();
+    final blockEntries = await LocalDb.instance.getAllBlockEntries();
     setState(() {
       _progressById = {for (final p in allProgress) p.exerciseId: p};
       _streak = streak;
+      _hasRecentStrongBlock = ExercisePathLogic.hasRecentStrongBlock(blockEntries);
       _loading = false;
     });
   }
@@ -60,6 +63,18 @@ class _RouteScreenState extends State<RouteScreen> {
     if (completed == true) {
       _loadProgress();
     }
+  }
+
+  void _practiceRespiracion() {
+    final respiracionExercises = ExercisePathLogic.exercisesForCategory(
+      exercises,
+      ExerciseCategory.respiracion,
+    );
+    final recommended = respiracionExercises.firstWhere(
+      (e) => ExercisePathLogic.isUnlocked(e, respiracionExercises, _progressById),
+      orElse: () => respiracionExercises.first,
+    );
+    _openExercise(recommended);
   }
 
   Widget _buildNode(Exercise exercise, bool unlocked, bool alignRight) {
@@ -292,6 +307,56 @@ class _RouteScreenState extends State<RouteScreen> {
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
+          if (_hasRecentStrongBlock)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 16),
+              child: Card(
+                elevation: 0,
+                color: Theme.of(context).colorScheme.errorContainer,
+                shape: AppStyles.cardShape(),
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.info_outline,
+                            color: Theme.of(context).colorScheme.onErrorContainer,
+                          ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              'Notamos bloqueos fuertes recientes',
+                              style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                                    color: Theme.of(context).colorScheme.onErrorContainer,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 6),
+                      Text(
+                        'Un ejercicio de respiración puede ayudarte a regularte antes de hablar.',
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                              color: Theme.of(context).colorScheme.onErrorContainer,
+                            ),
+                      ),
+                      const SizedBox(height: 12),
+                      SizedBox(
+                        width: double.infinity,
+                        child: FilledButton.tonal(
+                          onPressed: _practiceRespiracion,
+                          child: const Text('Practicar respiración'),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
           Card(
             elevation: 0,
             color: Theme.of(context).colorScheme.primaryContainer,
