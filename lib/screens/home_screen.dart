@@ -6,8 +6,20 @@ import 'progress_screen.dart';
 import 'difficult_words_screen.dart';
 import 'block_diary_screen.dart';
 import 'settings_screen.dart';
+
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
+
+  Color _difficultyColor(ExerciseDifficulty difficulty) {
+    switch (difficulty) {
+      case ExerciseDifficulty.principiante:
+        return Colors.green;
+      case ExerciseDifficulty.intermedio:
+        return Colors.amber.shade700;
+      case ExerciseDifficulty.avanzado:
+        return Colors.red;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -100,6 +112,16 @@ class HomeScreen extends StatelessWidget {
                   title: Text(exercise.title),
                   subtitle: Text(exercise.description),
                   trailing: const Icon(Icons.chevron_right),
+                  leading: CircleAvatar(
+                    backgroundColor: _difficultyColor(exercise.difficulty).withValues(alpha: 0.15),
+                    child: Text(
+                      exercise.difficulty.label[0],
+                      style: TextStyle(
+                        color: _difficultyColor(exercise.difficulty),
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
                   onTap: () {
                     Navigator.of(context).push(
                       MaterialPageRoute(
