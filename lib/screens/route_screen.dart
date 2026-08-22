@@ -42,6 +42,11 @@ class _RouteScreenState extends State<RouteScreen> {
     });
   }
 
+  int get _totalExercises => exercises.length;
+
+  int get _completedExercises =>
+      exercises.where((e) => (_progressById[e.id]?.timesCompleted ?? 0) > 0).length;
+
   Future<void> _openExercise(Exercise exercise) async {
     final completed = await Navigator.push<bool>(
       context,
@@ -284,6 +289,48 @@ class _RouteScreenState extends State<RouteScreen> {
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
+          Card(
+            elevation: 0,
+            color: Theme.of(context).colorScheme.primaryContainer,
+            shape: AppStyles.cardShape(),
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Tu progreso',
+                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                              color: Theme.of(context).colorScheme.onPrimaryContainer,
+                              fontWeight: FontWeight.bold,
+                            ),
+                      ),
+                      Text(
+                        '$_completedExercises / $_totalExercises',
+                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                              color: Theme.of(context).colorScheme.onPrimaryContainer,
+                              fontWeight: FontWeight.bold,
+                            ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(8),
+                    child: LinearProgressIndicator(
+                      value: _totalExercises == 0 ? 0 : _completedExercises / _totalExercises,
+                      minHeight: 10,
+                      backgroundColor: Theme.of(context).colorScheme.onPrimaryContainer.withValues(alpha: 0.15),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 16),
           for (final category in _orderedCategories)
             _buildCategorySection(
               category,
