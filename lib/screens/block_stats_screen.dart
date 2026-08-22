@@ -23,6 +23,31 @@ class BlockStatsScreen extends StatelessWidget {
     return counts;
   }
 
+  int get _streakWithoutStrongBlocks {
+    if (entries.isEmpty) return 0;
+
+    final strongDays = entries
+        .where((e) => e.severity == BlockSeverity.fuerte)
+        .map((e) => DateTime(e.dateTime.year, e.dateTime.month, e.dateTime.day))
+        .toSet();
+
+    final earliestDate = entries
+        .map((e) => DateTime(e.dateTime.year, e.dateTime.month, e.dateTime.day))
+        .reduce((a, b) => a.isBefore(b) ? a : b);
+
+    int streak = 0;
+    DateTime cursor = DateTime.now();
+    cursor = DateTime(cursor.year, cursor.month, cursor.day);
+
+    while (!cursor.isBefore(earliestDate)) {
+      if (strongDays.contains(cursor)) break;
+      streak++;
+      cursor = cursor.subtract(const Duration(days: 1));
+    }
+
+    return streak;
+  }
+
   Widget _buildBar(BuildContext context, String label, int count, int total, Color color) {
     final percent = total == 0 ? 0 : ((count / total) * 100).round();
     final fraction = total == 0 ? 0.0 : count / total;
@@ -102,6 +127,7 @@ class BlockStatsScreen extends StatelessWidget {
     final severityCounts = _severityCounts;
     final contextCounts = _contextCounts;
     final total = entries.length;
+    final streak = _streakWithoutStrongBlocks;
 
     return Scaffold(
       appBar: AppBar(title: const Text('Estadísticas de bloqueos')),
@@ -110,30 +136,66 @@ class BlockStatsScreen extends StatelessWidget {
           : ListView(
               padding: AppStyles.screenPadding,
               children: [
-                Card(
-                  elevation: 0,
-                  color: Theme.of(context).colorScheme.primaryContainer,
-                  shape: AppStyles.cardShape(),
-                  child: Padding(
-                    padding: const EdgeInsets.all(20),
-                    child: Column(
-                      children: [
-                        Text(
-                          '$total',
-                          style: Theme.of(context).textTheme.displayMedium?.copyWith(
-                                fontWeight: FontWeight.bold,
-                                color: Theme.of(context).colorScheme.onPrimaryContainer,
+                Row(
+                  children: [
+                    Expanded(
+                      child: Card(
+                        elevation: 0,
+                        color: Theme.of(context).colorScheme.primaryContainer,
+                        shape: AppStyles.cardShape(),
+                        child: Padding(
+                          padding: const EdgeInsets.all(20),
+                          child: Column(
+                            children: [
+                              Text(
+                                '$total',
+                                style: Theme.of(context).textTheme.displayMedium?.copyWith(
+                                      fontWeight: FontWeight.bold,
+                                      color: Theme.of(context).colorScheme.onPrimaryContainer,
+                                    ),
                               ),
-                        ),
-                        Text(
-                          'bloqueos registrados',
-                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                color: Theme.of(context).colorScheme.onPrimaryContainer,
+                              Text(
+                                'registros',
+                                textAlign: TextAlign.center,
+                                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                      color: Theme.of(context).colorScheme.onPrimaryContainer,
+                                    ),
                               ),
+                            ],
+                          ),
                         ),
-                      ],
+                      ),
                     ),
-                  ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Card(
+                        elevation: 0,
+                        color: Colors.green.withValues(alpha: 0.15),
+                        shape: AppStyles.cardShape(),
+                        child: Padding(
+                          padding: const EdgeInsets.all(20),
+                          child: Column(
+                            children: [
+                              Text(
+                                '$streak',
+                                style: Theme.of(context).textTheme.displayMedium?.copyWith(
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.green.shade800,
+                                    ),
+                              ),
+                              Text(
+                                'días sin bloqueos fuertes',
+                                textAlign: TextAlign.center,
+                                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                      color: Colors.green.shade800,
+                                    ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
                 const SizedBox(height: 16),
                 _buildSectionCard(
