@@ -3,8 +3,9 @@ import 'package:flutter/material.dart';
 
 class RepetitionTracker extends StatefulWidget {
   final VoidCallback? onAllCompleted;
+  final ValueChanged<int>? onProgress;
 
-  const RepetitionTracker({super.key, this.onAllCompleted});
+  const RepetitionTracker({super.key, this.onAllCompleted, this.onProgress});
 
   @override
   State<RepetitionTracker> createState() => _RepetitionTrackerState();
@@ -32,6 +33,7 @@ class _RepetitionTrackerState extends State<RepetitionTracker> {
     setState(() {
       _completedReps++;
     });
+    widget.onProgress?.call(_completedReps);
 
     if (_completedReps >= _targetReps!) {
       widget.onAllCompleted?.call();

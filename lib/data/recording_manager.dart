@@ -1,15 +1,14 @@
-import 'package:shared_preferences/shared_preferences.dart';
+import 'local_db.dart';
+import '../models/exercise.dart';
 
 class RecordingManager {
-  static String _keyFor(String exerciseId) => 'recording_$exerciseId';
-
-  static Future<void> saveRecordingPath(String exerciseId, String path) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(_keyFor(exerciseId), path);
+  static Future<void> addRecording(String exerciseId, String path) async {
+    await LocalDb.instance.insertRecording(
+      Recording(exerciseId: exerciseId, path: path, dateTime: DateTime.now()),
+    );
   }
 
-  static Future<String?> getRecordingPath(String exerciseId) async {
-    final prefs = await SharedPreferences.getInstance();
-    return prefs.getString(_keyFor(exerciseId));
+  static Future<List<Recording>> getRecordings(String exerciseId) async {
+    return LocalDb.instance.getRecordingsForExercise(exerciseId);
   }
 }

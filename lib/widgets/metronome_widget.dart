@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 class MetronomeWidget extends StatefulWidget {
-  const MetronomeWidget({super.key});
+  final VoidCallback? onStarted;
+
+  const MetronomeWidget({super.key, this.onStarted});
 
   @override
   State<MetronomeWidget> createState() => _MetronomeWidgetState();
@@ -24,6 +26,7 @@ class _MetronomeWidgetState extends State<MetronomeWidget> {
   }
 
   void _start() {
+    widget.onStarted?.call();
     final intervalMs = (60000 / _bpm).round();
     _timer = Timer.periodic(Duration(milliseconds: intervalMs), (_) {
       SystemSound.play(SystemSoundType.click);

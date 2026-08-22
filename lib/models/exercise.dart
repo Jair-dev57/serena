@@ -279,3 +279,38 @@ class BreathingPattern {
 
   int get totalSeconds => inhaleSeconds + holdSeconds + exhaleSeconds;
 }
+
+
+// Recording
+
+class Recording {
+  final int? id;
+  final String exerciseId;
+  final String path;
+  final DateTime dateTime;
+
+  const Recording({
+    this.id,
+    required this.exerciseId,
+    required this.path,
+    required this.dateTime,
+  });
+
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'exerciseId': exerciseId,
+      'path': path,
+      'dateTime': dateTime.toIso8601String(),
+    };
+  }
+
+  factory Recording.fromMap(Map<String, dynamic> map) {
+    return Recording(
+      id: map['id'] as int?,
+      exerciseId: map['exerciseId'] as String,
+      path: map['path'] as String,
+      dateTime: DateTime.parse(map['dateTime'] as String),
+    );
+  }
+}

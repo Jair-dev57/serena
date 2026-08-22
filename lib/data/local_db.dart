@@ -18,7 +18,7 @@ class LocalDb {
     final path = join(dbPath, 'fluidez_app.db');
     return openDatabase(
       path,
-      version: 5,
+      version: 6,
       onCreate: (db, version) async {
         await db.execute('''
           CREATE TABLE practice_sessions (
@@ -49,6 +49,14 @@ class LocalDb {
             exerciseId TEXT PRIMARY KEY,
             timesCompleted INTEGER NOT NULL,
             lastCompletedAt TEXT
+          )
+        ''');
+        await db.execute('''
+          CREATE TABLE recordings (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            exerciseId TEXT NOT NULL,
+            path TEXT NOT NULL,
+            dateTime TEXT NOT NULL
           )
         ''');
       },
@@ -82,6 +90,16 @@ class LocalDb {
               exerciseId TEXT PRIMARY KEY,
               timesCompleted INTEGER NOT NULL,
               lastCompletedAt TEXT
+            )
+          ''');
+        }
+        if (oldVersion < 6) {
+          await db.execute('''
+            CREATE TABLE recordings (
+              id INTEGER PRIMARY KEY AUTOINCREMENT,
+              exerciseId TEXT NOT NULL,
+              path TEXT NOT NULL,
+              dateTime TEXT NOT NULL
             )
           ''');
         }
@@ -208,5 +226,21 @@ class LocalDb {
         whereArgs: [exerciseId],
       );
     }
+  }
+
+  Future<void> insertRecording(Recording recording) async {
+    final db = await database;
+    await db.insert('recordings', recording.toMap()..remove('id'));
+  }
+
+  Future<List<Recording>> getRecordingsForExercise(String exerciseId) async {
+    final db = await database;
+    final maps = await db.query(
+      'recordings',
+      where: 'exerciseId = ?',
+      whereArgs: [exerciseId],
+      orderBy: 'dateTime DESC',
+    );
+    return maps.map((m) => Recording.fromMap(m)).toList();
   }
 }

@@ -6,15 +6,20 @@ import 'package:path_provider/path_provider.dart';
 import '../data/local_db.dart';
 import '../data/recording_manager.dart';
 import '../models/exercise.dart';
+import '../theme/app_styles.dart';
 
 class RecorderWidget extends StatefulWidget {
   final String exerciseId;
   final String exerciseTitle;
+  final VoidCallback? onRecorded;
+  final VoidCallback? onRecordingStarted;
 
   const RecorderWidget({
     super.key,
     required this.exerciseId,
     required this.exerciseTitle,
+    this.onRecorded,
+    this.onRecordingStarted,
   });
 
   @override
@@ -26,20 +31,23 @@ class _RecorderWidgetState extends State<RecorderWidget> {
   final AudioPlayer _player = AudioPlayer();
   bool _isRecording = false;
   bool _isPlaying = false;
-  String? _lastRecordingPath;
-  String? _previousRecordingPath;
+  String? _playingPath;
   bool _sessionSaved = false;
+  bool _expanded = false;
+  List<Recording> _recordings = [];
+
+  static const int _collapsedCount = 2;
 
   @override
   void initState() {
     super.initState();
-    _loadPreviousRecording();
+    _loadRecordings();
   }
 
-  Future<void> _loadPreviousRecording() async {
-    final path = await RecordingManager.getRecordingPath(widget.exerciseId);
+  Future<void> _loadRecordings() async {
+    final recordings = await RecordingManager.getRecordings(widget.exerciseId);
     setState(() {
-      _previousRecordingPath = path;
+      _recordings = recordings;
     });
   }
 
@@ -53,16 +61,17 @@ class _RecorderWidgetState extends State<RecorderWidget> {
       _isRecording = true;
       _sessionSaved = false;
     });
+    widget.onRecordingStarted?.call();
   }
 
   Future<void> _stopRecording() async {
     final path = await _recorder.stop();
     setState(() {
       _isRecording = false;
-      _lastRecordingPath = path;
     });
     if (path != null) {
-      await RecordingManager.saveRecordingPath(widget.exerciseId, path);
+      await RecordingManager.addRecording(widget.exerciseId, path);
+      await _loadRecordings();
     }
     await LocalDb.instance.insertSession(
       PracticeSession(
@@ -73,17 +82,20 @@ class _RecorderWidgetState extends State<RecorderWidget> {
     setState(() {
       _sessionSaved = true;
     });
+    widget.onRecorded?.call();
   }
 
   Future<void> _playPath(String path) async {
     setState(() {
       _isPlaying = true;
+      _playingPath = path;
     });
     await _player.play(DeviceFileSource(path));
     _player.onPlayerComplete.listen((event) {
       if (mounted) {
         setState(() {
           _isPlaying = false;
+          _playingPath = null;
         });
       }
     });
@@ -96,36 +108,118 @@ class _RecorderWidgetState extends State<RecorderWidget> {
     super.dispose();
   }
 
+  String _formatDateTime(DateTime dt) {
+    final hour = dt.hour.toString().padLeft(2, '0');
+    final minute = dt.minute.toString().padLeft(2, '0');
+    return '${dt.day}/${dt.month} $hour:$minute';
+  }
+
+  Widget _buildRecordingTile(Recording recording, int index) {
+    final isLatest = index == 0;
+    final isPlayingThis = _isPlaying && _playingPath == recording.path;
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+        decoration: BoxDecoration(
+          border: Border.all(
+            color: isLatest
+                ? Theme.of(context).colorScheme.primary
+                : Theme.of(context).colorScheme.outlineVariant,
+          ),
+          color: isLatest
+              ? Theme.of(context).colorScheme.primaryContainer.withValues(alpha: 0.3)
+              : null,
+          borderRadius: BorderRadius.circular(AppStyles.barRadius),
+        ),
+        child: Row(
+          children: [
+            InkWell(
+              onTap: _isPlaying && !isPlayingThis ? null : () => _playPath(recording.path),
+              customBorder: const CircleBorder(),
+              child: Container(
+                width: 32,
+                height: 32,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: isLatest
+                      ? Theme.of(context).colorScheme.primaryContainer
+                      : Theme.of(context).colorScheme.surfaceContainerHighest,
+                ),
+                child: Icon(
+                  isPlayingThis ? Icons.pause : Icons.play_arrow,
+                  size: 18,
+                  color: isLatest
+                      ? Theme.of(context).colorScheme.onPrimaryContainer
+                      : Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Repetición ${_recordings.length - index}',
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600),
+                  ),
+                  Text(
+                    isLatest ? 'Más reciente · ${_formatDateTime(recording.dateTime)}' : _formatDateTime(recording.dateTime),
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    final hiddenCount = _recordings.length - _collapsedCount;
+    final visibleRecordings = _expanded || hiddenCount <= 0
+        ? _recordings
+        : _recordings.take(_collapsedCount).toList();
+
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        FilledButton.icon(
-          onPressed: _isRecording ? _stopRecording : _startRecording,
-          icon: Icon(_isRecording ? Icons.stop : Icons.mic),
-          label: Text(_isRecording ? 'Detener' : 'Grabar'),
+        SizedBox(
+          width: double.infinity,
+          child: FilledButton.icon(
+            onPressed: _isRecording ? _stopRecording : _startRecording,
+            icon: Icon(_isRecording ? Icons.stop : Icons.mic),
+            label: Text(_isRecording ? 'Detener' : 'Grabar repetición ${_recordings.length + 1}'),
+          ),
         ),
-        if (_lastRecordingPath != null) ...[
-          const SizedBox(height: 8),
-          OutlinedButton.icon(
-            onPressed: _isPlaying ? null : () => _playPath(_lastRecordingPath!),
-            icon: const Icon(Icons.play_arrow),
-            label: Text(_isPlaying ? 'Reproduciendo...' : 'Escuchar esta grabación'),
+        if (visibleRecordings.isNotEmpty) ...[
+          const SizedBox(height: 16),
+          for (int i = 0; i < visibleRecordings.length; i++) _buildRecordingTile(visibleRecordings[i], i),
+        ],
+        if (hiddenCount > 0)
+          Center(
+            child: TextButton.icon(
+              onPressed: () => setState(() => _expanded = !_expanded),
+              icon: Icon(_expanded ? Icons.expand_less : Icons.expand_more),
+              label: Text(_expanded ? 'Ver menos' : 'Ver $hiddenCount grabaciones más'),
+            ),
           ),
-        ],
-        if (_previousRecordingPath != null &&
-            _previousRecordingPath != _lastRecordingPath) ...[
-          const SizedBox(height: 8),
-          OutlinedButton.icon(
-            onPressed: _isPlaying ? null : () => _playPath(_previousRecordingPath!),
-            icon: const Icon(Icons.history),
-            label: const Text('Escuchar grabación anterior'),
+        if (_sessionSaved)
+          Padding(
+            padding: const EdgeInsets.only(top: 4),
+            child: Text(
+              '✓ Sesión guardada en tu progreso',
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
+            ),
           ),
-        ],
-        if (_sessionSaved) ...[
-          const SizedBox(height: 8),
-          const Text('✓ Sesión guardada en tu progreso'),
-        ],
       ],
     );
   }
