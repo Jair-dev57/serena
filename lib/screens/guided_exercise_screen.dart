@@ -4,6 +4,7 @@ import '../models/exercise.dart';
 import '../theme/app_styles.dart';
 import '../widgets/recorder_widget.dart';
 import '../widgets/metronome_widget.dart';
+import '../widgets/category_illustration.dart';
 
 class GuidedExerciseScreen extends StatefulWidget {
   final Exercise exercise;
@@ -172,6 +173,8 @@ class _GuidedExerciseScreenState extends State<GuidedExerciseScreen>
               child: SingleChildScrollView(
                 child: Column(
                   children: [
+                    const SizedBox(height: 24),
+                    CategoryIllustration(category: widget.exercise.category),
                     const SizedBox(height: 24),
                     Text(
                       widget.exercise.steps[_currentStep],

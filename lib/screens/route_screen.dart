@@ -5,6 +5,7 @@ import '../data/exercise_path_logic.dart';
 import '../models/exercise.dart';
 import '../theme/app_styles.dart';
 import 'guided_exercise_screen.dart';
+import 'breathing_timer_screen.dart';
 import 'progress_screen.dart';
 import 'difficult_words_screen.dart';
 import 'block_diary_screen.dart';
@@ -54,10 +55,13 @@ class _RouteScreenState extends State<RouteScreen> {
       exercises.where((e) => (_progressById[e.id]?.timesCompleted ?? 0) > 0).length;
 
   Future<void> _openExercise(Exercise exercise) async {
+    final isBreathing = exercise.category == ExerciseCategory.respiracion;
     final completed = await Navigator.push<bool>(
       context,
       MaterialPageRoute(
-        builder: (context) => GuidedExerciseScreen(exercise: exercise),
+        builder: (context) => isBreathing
+            ? BreathingTimerScreen(exercise: exercise)
+            : GuidedExerciseScreen(exercise: exercise),
       ),
     );
     if (completed == true) {

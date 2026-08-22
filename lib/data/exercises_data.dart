@@ -17,6 +17,7 @@ final List<Exercise> exercises = [
     difficulty: ExerciseDifficulty.principiante,
     durationMinutes: 5,
     tags: ['respiración', 'relajación', 'base'],
+    breathingPattern: BreathingPattern(inhaleSeconds: 4, holdSeconds: 2, exhaleSeconds: 6),
   ),
   const Exercise(
     id: 'resp_contada',
@@ -32,6 +33,7 @@ final List<Exercise> exercises = [
     difficulty: ExerciseDifficulty.principiante,
     durationMinutes: 6,
     tags: ['respiración', 'control de aire'],
+    breathingPattern: BreathingPattern(inhaleSeconds: 3, exhaleSeconds: 8),
   ),
   const Exercise(
     id: 'resp_labios_fruncidos',
@@ -47,6 +49,7 @@ final List<Exercise> exercises = [
     difficulty: ExerciseDifficulty.principiante,
     durationMinutes: 5,
     tags: ['respiración', 'relajación'],
+    breathingPattern: BreathingPattern(inhaleSeconds: 3, exhaleSeconds: 7),
   ),
   const Exercise(
     id: 'resp_sostenida',
@@ -78,6 +81,7 @@ final List<Exercise> exercises = [
     difficulty: ExerciseDifficulty.intermedio,
     durationMinutes: 6,
     tags: ['respiración', 'ansiedad', 'previo a hablar'],
+    breathingPattern: BreathingPattern(inhaleSeconds: 4, holdSeconds: 7, exhaleSeconds: 8),
   ),
   const Exercise(
     id: 'resp_previa_llamada',
@@ -93,6 +97,7 @@ final List<Exercise> exercises = [
     difficulty: ExerciseDifficulty.intermedio,
     durationMinutes: 3,
     tags: ['respiración', 'llamadas', 'ansiedad'],
+    breathingPattern: BreathingPattern(inhaleSeconds: 4, exhaleSeconds: 6),
   ),
   const Exercise(
     id: 'resp_caminando',

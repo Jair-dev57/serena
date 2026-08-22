@@ -4,6 +4,7 @@ import '../models/exercise.dart';
 import '../data/exercises_data.dart';
 import '../data/exercise_path_logic.dart';
 import 'guided_exercise_screen.dart';
+import 'breathing_timer_screen.dart';
 
 enum WordSortOption { recent, oldest, alphabetical }
 
@@ -194,6 +195,18 @@ class _DifficultWordsScreenState extends State<DifficultWordsScreen> {
     );
   }
 
+  void _openExercise(Exercise exercise) {
+    final isBreathing = exercise.category == ExerciseCategory.respiracion;
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => isBreathing
+            ? BreathingTimerScreen(exercise: exercise)
+            : GuidedExerciseScreen(exercise: exercise),
+      ),
+    );
+  }
+
   Future<void> _practiceWord(DifficultWord word) async {
     final allProgress = await LocalDb.instance.getAllProgress();
     final progressById = {for (final p in allProgress) p.exerciseId: p};
@@ -244,12 +257,7 @@ class _DifficultWordsScreenState extends State<DifficultWordsScreen> {
                   child: FilledButton(
                     onPressed: () {
                       Navigator.pop(bottomSheetContext);
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => GuidedExerciseScreen(exercise: recommended),
-                        ),
-                      );
+                      _openExercise(recommended);
                     },
                     child: const Text('Practicar este'),
                   ),
@@ -290,12 +298,7 @@ class _DifficultWordsScreenState extends State<DifficultWordsScreen> {
                   subtitle: Text(exercise.category.label),
                   onTap: () {
                     Navigator.pop(bottomSheetContext);
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => GuidedExerciseScreen(exercise: exercise),
-                      ),
-                    );
+                    _openExercise(exercise);
                   },
                 ),
             ],

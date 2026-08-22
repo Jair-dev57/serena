@@ -45,6 +45,7 @@ class Exercise {
   final ExerciseDifficulty difficulty;
   final int durationMinutes;
   final List<String> tags;
+  final BreathingPattern? breathingPattern;
 
   const Exercise({
     required this.id,
@@ -55,6 +56,7 @@ class Exercise {
     required this.difficulty,
     required this.durationMinutes,
     this.tags = const [],
+    this.breathingPattern,
   });
 }
 
@@ -261,4 +263,19 @@ class ExerciseProgress {
           : null,
     );
   }
+}
+
+
+class BreathingPattern {
+  final int inhaleSeconds;
+  final int holdSeconds;
+  final int exhaleSeconds;
+
+  const BreathingPattern({
+    required this.inhaleSeconds,
+    this.holdSeconds = 0,
+    required this.exhaleSeconds,
+  });
+
+  int get totalSeconds => inhaleSeconds + holdSeconds + exhaleSeconds;
 }
