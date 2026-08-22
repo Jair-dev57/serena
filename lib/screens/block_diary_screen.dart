@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../data/local_db.dart';
 import '../models/exercise.dart';
+import 'block_stats_screen.dart';
 
 class BlockDiaryScreen extends StatefulWidget {
   const BlockDiaryScreen({super.key});
@@ -364,6 +365,17 @@ class _BlockDiaryScreenState extends State<BlockDiaryScreen> {
       appBar: AppBar(
         title: const Text('Diario de bloqueos'),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.bar_chart),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => BlockStatsScreen(entries: _entries),
+                ),
+              );
+            },
+          ),
           IconButton(
             icon: Icon(
               _filterSeverity != null || _filterContext != null
