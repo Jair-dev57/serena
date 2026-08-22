@@ -5,7 +5,7 @@ import 'exercise_detail_screen.dart';
 import 'progress_screen.dart';
 import 'difficult_words_screen.dart';
 import 'block_diary_screen.dart';
-
+import 'settings_screen.dart';
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
@@ -74,8 +74,12 @@ class HomeScreen extends StatelessWidget {
             ListTile(
               leading: const Icon(Icons.settings_outlined),
               title: const Text('Ajustes'),
-              subtitle: const Text('Próximamente'),
-              enabled: false,
+              onTap: () {
+                Navigator.of(context).pop();
+                Navigator.of(context).push(
+                  MaterialPageRoute(builder: (context) => const SettingsScreen()),
+                );
+              },
             ),
           ],
         ),
