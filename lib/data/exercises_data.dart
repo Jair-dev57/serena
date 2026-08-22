@@ -2,6 +2,30 @@ import '../models/exercise.dart';
 
 final List<Exercise> exercises = [
   const Exercise(
+    title: 'Respiración diafragmática',
+    category: ExerciseCategory.respiracion,
+    description: 'Aprende a respirar desde el diafragma para dar soporte constante a tu voz.',
+    steps: [
+      'Siéntate o acuéstate cómodamente, con una mano en el pecho y otra en el abdomen.',
+      'Inhala por la nariz durante 4 segundos, sintiendo cómo se expande el abdomen (no el pecho).',
+      'Sostén el aire 2 segundos.',
+      'Exhala lentamente por la boca durante 6 segundos.',
+      'Repite el ciclo 8 a 10 veces, sin forzar.',
+    ],
+  ),
+  const Exercise(
+    title: 'Inicio suave de palabras',
+    category: ExerciseCategory.inicioSuave,
+    description: 'Practica comenzar palabras con un ataque vocal suave, reduciendo la tensión al iniciar el habla.',
+    steps: [
+      'Elige 5 palabras que empiecen con vocal (ej: "amigo", "escuela").',
+      'Antes de decir cada palabra, deja salir un poco de aire suavemente antes de que empiece el sonido.',
+      'Di la palabra alargando un poco la primera sílaba, sin tensión en la garganta.',
+      'Repite cada palabra 3 veces, bajando la tensión cada vez.',
+      'Cuando te sientas cómodo, intenta lo mismo con frases cortas.',
+    ],
+  ),
+  const Exercise(
     title: 'Habla con ritmo controlado',
     category: ExerciseCategory.ritmo,
     description: 'Hablar despacio y con ritmo ayuda a reducir bloqueos.',
