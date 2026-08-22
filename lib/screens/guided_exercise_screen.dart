@@ -4,7 +4,6 @@ import '../models/exercise.dart';
 import '../theme/app_styles.dart';
 import '../widgets/recorder_widget.dart';
 import '../widgets/metronome_widget.dart';
-import '../widgets/category_illustration.dart';
 
 class GuidedExerciseScreen extends StatefulWidget {
   final Exercise exercise;
@@ -17,19 +16,12 @@ class GuidedExerciseScreen extends StatefulWidget {
 
 class _GuidedExerciseScreenState extends State<GuidedExerciseScreen>
     with SingleTickerProviderStateMixin {
-  int _currentStep = 0;
   bool _completed = false;
-  ExerciseRank? _previousRank;
   ExerciseRank? _newRank;
   bool _rankedUp = false;
 
   late final AnimationController _badgeController;
   late final Animation<double> _badgeScale;
-
-  bool get _isLastStep => _currentStep == widget.exercise.steps.length - 1;
-
-  bool get _showsRecorder =>
-      widget.exercise.category != ExerciseCategory.respiracion;
 
   @override
   void initState() {
@@ -50,33 +42,26 @@ class _GuidedExerciseScreenState extends State<GuidedExerciseScreen>
     super.dispose();
   }
 
-  Future<void> _nextStep() async {
-    if (!_isLastStep) {
-      setState(() {
-        _currentStep++;
-      });
-    } else {
-      final before = await LocalDb.instance.getProgressForExercise(widget.exercise.id);
-      await LocalDb.instance.incrementProgress(widget.exercise.id);
-      final after = await LocalDb.instance.getProgressForExercise(widget.exercise.id);
+  Future<void> _markCompleted() async {
+    final before = await LocalDb.instance.getProgressForExercise(widget.exercise.id);
+    await LocalDb.instance.incrementProgress(widget.exercise.id);
+    final after = await LocalDb.instance.getProgressForExercise(widget.exercise.id);
 
-      await LocalDb.instance.insertSession(
-        PracticeSession(exerciseTitle: widget.exercise.title, date: DateTime.now()),
-      );
+    await LocalDb.instance.insertSession(
+      PracticeSession(exerciseTitle: widget.exercise.title, date: DateTime.now()),
+    );
 
-      final previousRank = before?.rank;
-      final newRank = after!.rank;
+    final previousRank = before?.rank;
+    final newRank = after!.rank;
 
-      setState(() {
-        _previousRank = previousRank;
-        _newRank = newRank;
-        _rankedUp = previousRank != null && previousRank != newRank;
-        _completed = true;
-      });
+    setState(() {
+      _newRank = newRank;
+      _rankedUp = previousRank != null && previousRank != newRank;
+      _completed = true;
+    });
 
-      if (_rankedUp) {
-        _badgeController.forward(from: 0);
-      }
+    if (_rankedUp) {
+      _badgeController.forward(from: 0);
     }
   }
 
@@ -146,8 +131,6 @@ class _GuidedExerciseScreenState extends State<GuidedExerciseScreen>
       );
     }
 
-    final progress = (_currentStep + 1) / widget.exercise.steps.length;
-
     return Scaffold(
       appBar: AppBar(title: Text(widget.exercise.title)),
       body: Padding(
@@ -155,40 +138,35 @@ class _GuidedExerciseScreenState extends State<GuidedExerciseScreen>
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            ClipRRect(
-              borderRadius: BorderRadius.circular(8),
-              child: LinearProgressIndicator(
-                value: progress,
-                minHeight: 8,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Paso ${_currentStep + 1} de ${widget.exercise.steps.length}',
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: Theme.of(context).colorScheme.onSurfaceVariant,
-                  ),
-            ),
             Expanded(
               child: SingleChildScrollView(
                 child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const SizedBox(height: 24),
-                    CategoryIllustration(category: widget.exercise.category),
-                    const SizedBox(height: 24),
                     Text(
-                      widget.exercise.steps[_currentStep],
-                      textAlign: TextAlign.center,
-                      style: Theme.of(context).textTheme.headlineSmall,
+                      widget.exercise.description,
+                      style: Theme.of(context).textTheme.bodyLarge,
                     ),
-                    if (_isLastStep && widget.exercise.id == 'ritmo_controlado') ...[
-                      const SizedBox(height: 24),
+                    const SizedBox(height: 20),
+                    Text(
+                      'Pasos',
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                    const SizedBox(height: 8),
+                    for (final step in widget.exercise.steps)
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 12),
+                        child: Text(
+                          '•  $step',
+                          style: Theme.of(context).textTheme.bodyLarge,
+                        ),
+                      ),
+                    if (widget.exercise.id == 'ritmo_controlado') ...[
+                      const SizedBox(height: 12),
                       const MetronomeWidget(),
                     ],
-                    if (_isLastStep && _showsRecorder) ...[
-                      const SizedBox(height: 24),
-                      RecorderWidget(exerciseTitle: widget.exercise.title),
-                    ],
+                    const SizedBox(height: 12),
+                    RecorderWidget(exerciseTitle: widget.exercise.title),
                     const SizedBox(height: 24),
                   ],
                 ),
@@ -197,8 +175,8 @@ class _GuidedExerciseScreenState extends State<GuidedExerciseScreen>
             SizedBox(
               width: double.infinity,
               child: FilledButton(
-                onPressed: _nextStep,
-                child: Text(_isLastStep ? 'Terminar' : 'Siguiente'),
+                onPressed: _markCompleted,
+                child: const Text('Completado'),
               ),
             ),
           ],

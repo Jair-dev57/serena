@@ -184,19 +184,41 @@ class _BreathingTimerScreenState extends State<BreathingTimerScreen>
     }
 
     if (!_running) {
-      return Scaffold(
-        appBar: AppBar(title: Text(widget.exercise.title)),
-        body: Padding(
-          padding: const EdgeInsets.all(24),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(widget.exercise.description),
-              const SizedBox(height: 24),
-              Text(
-                'Elige cuánto quieres practicar',
-                style: Theme.of(context).textTheme.titleMedium,
-              ),
+    return Scaffold(
+      appBar: AppBar(title: Text(widget.exercise.title)),
+      body: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(
+              child: SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      widget.exercise.description,
+                      style: Theme.of(context).textTheme.bodyLarge,
+                    ),
+                    const SizedBox(height: 20),
+                    Text(
+                      'Pasos',
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                    const SizedBox(height: 8),
+                    for (final step in widget.exercise.steps)
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 12),
+                        child: Text(
+                          '•  $step',
+                          style: Theme.of(context).textTheme.bodyLarge,
+                        ),
+                      ),
+                    const SizedBox(height: 20),
+                    Text(
+                      'Elige cuánto quieres practicar',
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
               const SizedBox(height: 12),
               Wrap(
                 spacing: 8,
@@ -208,7 +230,11 @@ class _BreathingTimerScreenState extends State<BreathingTimerScreen>
                   );
                 }).toList(),
               ),
-              const Spacer(),
+            ],
+          ),
+        ),
+      ),
+      const SizedBox(height: 16),
               SizedBox(
                 width: double.infinity,
                 child: FilledButton(
