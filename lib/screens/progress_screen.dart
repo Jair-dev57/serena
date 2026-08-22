@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import '../data/local_db.dart';
+import '../data/weekly_goal_manager.dart';
 import '../models/exercise.dart';
+import '../widgets/weekly_goal_card.dart';
 
 class ProgressScreen extends StatefulWidget {
   const ProgressScreen({super.key});
@@ -12,6 +14,8 @@ class ProgressScreen extends StatefulWidget {
 class _ProgressScreenState extends State<ProgressScreen> {
   List<PracticeSession> _sessions = [];
   int _streak = 0;
+  int _weeklyTarget = WeeklyGoalManager.defaultTarget;
+  int _sessionsThisWeek = 0;
   bool _loading = true;
 
   @override
@@ -23,10 +27,20 @@ class _ProgressScreenState extends State<ProgressScreen> {
   Future<void> _loadData() async {
     final sessions = await LocalDb.instance.getAllSessions();
     final streak = await LocalDb.instance.getCurrentStreak();
+    final weeklyTarget = await WeeklyGoalManager.getTarget();
     setState(() {
       _sessions = sessions;
       _streak = streak;
+      _weeklyTarget = weeklyTarget;
+      _sessionsThisWeek = WeeklyGoalManager.sessionsThisWeek(sessions);
       _loading = false;
+    });
+  }
+
+  Future<void> _onWeeklyTargetChanged(int newTarget) async {
+    await WeeklyGoalManager.setTarget(newTarget);
+    setState(() {
+      _weeklyTarget = newTarget;
     });
   }
 
@@ -38,6 +52,14 @@ class _ProgressScreenState extends State<ProgressScreen> {
           ? const Center(child: CircularProgressIndicator())
           : Column(
               children: [
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+                  child: WeeklyGoalCard(
+                    sessionsThisWeek: _sessionsThisWeek,
+                    target: _weeklyTarget,
+                    onTargetChanged: _onWeeklyTargetChanged,
+                  ),
+                ),
                 Card(
                   margin: const EdgeInsets.all(16),
                   child: ListTile(

@@ -2,8 +2,11 @@ import 'package:flutter/material.dart';
 import '../data/exercises_data.dart';
 import '../data/local_db.dart';
 import '../data/exercise_path_logic.dart';
+import '../data/weekly_goal_manager.dart';
 import '../models/exercise.dart';
 import '../theme/app_styles.dart';
+import '../widgets/stat_chip.dart';
+import '../widgets/weekly_goal_card.dart';
 import 'guided_exercise_screen.dart';
 import 'breathing_timer_screen.dart';
 import 'progress_screen.dart';
@@ -23,6 +26,8 @@ class _RouteScreenState extends State<RouteScreen> {
   bool _loading = true;
   int _streak = 0;
   bool _hasRecentStrongBlock = false;
+  int _weeklyTarget = WeeklyGoalManager.defaultTarget;
+  int _sessionsThisWeek = 0;
 
   static const List<ExerciseCategory> _orderedCategories = [
     ExerciseCategory.respiracion,
@@ -41,11 +46,22 @@ class _RouteScreenState extends State<RouteScreen> {
     final allProgress = await LocalDb.instance.getAllProgress();
     final streak = await LocalDb.instance.getCurrentStreak();
     final blockEntries = await LocalDb.instance.getAllBlockEntries();
+    final sessions = await LocalDb.instance.getAllSessions();
+    final weeklyTarget = await WeeklyGoalManager.getTarget();
     setState(() {
       _progressById = {for (final p in allProgress) p.exerciseId: p};
       _streak = streak;
       _hasRecentStrongBlock = ExercisePathLogic.hasRecentStrongBlock(blockEntries);
+      _weeklyTarget = weeklyTarget;
+      _sessionsThisWeek = WeeklyGoalManager.sessionsThisWeek(sessions);
       _loading = false;
+    });
+  }
+
+  Future<void> _onWeeklyTargetChanged(int newTarget) async {
+    await WeeklyGoalManager.setTarget(newTarget);
+    setState(() {
+      _weeklyTarget = newTarget;
     });
   }
 
@@ -79,6 +95,59 @@ class _RouteScreenState extends State<RouteScreen> {
       orElse: () => respiracionExercises.first,
     );
     _openExercise(recommended);
+  }
+
+  void _showStreakInfo() {
+    showModalBottomSheet(
+      context: context,
+      showDragHandle: true,
+      builder: (context) {
+        return Padding(
+          padding: const EdgeInsets.fromLTRB(24, 0, 24, 32),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(Icons.local_fire_department, size: 48, color: Colors.orange),
+              const SizedBox(height: 12),
+              Text(
+                _streak == 1 ? '1 día de racha' : '$_streak días de racha',
+                style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Practicá al menos un ejercicio por día para mantener tu racha activa.',
+                textAlign: TextAlign.center,
+                style: Theme.of(context).textTheme.bodyMedium,
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  void _showGoalInfo() {
+    showModalBottomSheet(
+      context: context,
+      showDragHandle: true,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setSheetState) {
+            return Padding(
+              padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
+              child: WeeklyGoalCard(
+                sessionsThisWeek: _sessionsThisWeek,
+                target: _weeklyTarget,
+                onTargetChanged: (newTarget) async {
+                  await _onWeeklyTargetChanged(newTarget);
+                  setSheetState(() {});
+                },
+              ),
+            );
+          },
+        );
+      },
+    );
   }
 
   Widget _buildNode(Exercise exercise, bool unlocked, bool alignRight) {
@@ -240,8 +309,26 @@ class _RouteScreenState extends State<RouteScreen> {
         category: ExercisePathLogic.exercisesForCategory(exercises, category),
     };
 
+    final goalAchieved = _sessionsThisWeek >= _weeklyTarget;
+
     return Scaffold(
-      appBar: AppBar(title: const Text('Serena')),
+      appBar: AppBar(
+        title: const Text('Serena'),
+        actions: [
+          StatChip(
+            icon: Icons.local_fire_department,
+            label: '$_streak',
+            iconColor: Colors.orange,
+            onTap: _showStreakInfo,
+          ),
+          StatChip(
+            icon: goalAchieved ? Icons.emoji_events : Icons.flag_outlined,
+            label: '$_sessionsThisWeek/$_weeklyTarget',
+            onTap: _showGoalInfo,
+          ),
+          const SizedBox(width: 8),
+        ],
+      ),
       drawer: Drawer(
         child: ListView(
           padding: EdgeInsets.zero,
@@ -385,23 +472,6 @@ class _RouteScreenState extends State<RouteScreen> {
                         style: Theme.of(context).textTheme.titleMedium?.copyWith(
                               color: Theme.of(context).colorScheme.onPrimaryContainer,
                               fontWeight: FontWeight.bold,
-                            ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 6),
-                  Row(
-                    children: [
-                      Icon(
-                        Icons.local_fire_department,
-                        size: 18,
-                        color: Theme.of(context).colorScheme.onPrimaryContainer,
-                      ),
-                      const SizedBox(width: 4),
-                      Text(
-                        _streak == 1 ? '1 día de racha' : '$_streak días de racha',
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                              color: Theme.of(context).colorScheme.onPrimaryContainer,
                             ),
                       ),
                     ],
