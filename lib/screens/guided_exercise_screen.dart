@@ -1,7 +1,7 @@
-
 import 'package:flutter/material.dart';
 import '../data/local_db.dart';
 import '../models/exercise.dart';
+import '../theme/app_styles.dart';
 import '../widgets/recorder_widget.dart';
 import '../widgets/metronome_widget.dart';
 
@@ -14,14 +14,40 @@ class GuidedExerciseScreen extends StatefulWidget {
   State<GuidedExerciseScreen> createState() => _GuidedExerciseScreenState();
 }
 
-class _GuidedExerciseScreenState extends State<GuidedExerciseScreen> {
+class _GuidedExerciseScreenState extends State<GuidedExerciseScreen>
+    with SingleTickerProviderStateMixin {
   int _currentStep = 0;
   bool _completed = false;
+  ExerciseRank? _previousRank;
+  ExerciseRank? _newRank;
+  bool _rankedUp = false;
+
+  late final AnimationController _badgeController;
+  late final Animation<double> _badgeScale;
 
   bool get _isLastStep => _currentStep == widget.exercise.steps.length - 1;
 
   bool get _showsRecorder =>
       widget.exercise.category != ExerciseCategory.respiracion;
+
+  @override
+  void initState() {
+    super.initState();
+    _badgeController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 600),
+    );
+    _badgeScale = TweenSequence<double>([
+      TweenSequenceItem(tween: Tween(begin: 0.0, end: 1.2), weight: 60),
+      TweenSequenceItem(tween: Tween(begin: 1.2, end: 1.0), weight: 40),
+    ]).animate(CurvedAnimation(parent: _badgeController, curve: Curves.easeOut));
+  }
+
+  @override
+  void dispose() {
+    _badgeController.dispose();
+    super.dispose();
+  }
 
   Future<void> _nextStep() async {
     if (!_isLastStep) {
@@ -29,10 +55,23 @@ class _GuidedExerciseScreenState extends State<GuidedExerciseScreen> {
         _currentStep++;
       });
     } else {
+      final before = await LocalDb.instance.getProgressForExercise(widget.exercise.id);
       await LocalDb.instance.incrementProgress(widget.exercise.id);
+      final after = await LocalDb.instance.getProgressForExercise(widget.exercise.id);
+
+      final previousRank = before?.rank;
+      final newRank = after!.rank;
+
       setState(() {
+        _previousRank = previousRank;
+        _newRank = newRank;
+        _rankedUp = previousRank != null && previousRank != newRank;
         _completed = true;
       });
+
+      if (_rankedUp) {
+        _badgeController.forward(from: 0);
+      }
     }
   }
 
@@ -47,16 +86,43 @@ class _GuidedExerciseScreenState extends State<GuidedExerciseScreen> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(
-                  Icons.check_circle,
-                  size: 80,
-                  color: Theme.of(context).colorScheme.primary,
-                ),
+                if (_rankedUp && _newRank != null)
+                  ScaleTransition(
+                    scale: _badgeScale,
+                    child: Column(
+                      children: [
+                        Container(
+                          width: 90,
+                          height: 90,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: AppStyles.rankColor(_newRank!),
+                          ),
+                          child: const Icon(Icons.emoji_events, color: Colors.white, size: 42),
+                        ),
+                        const SizedBox(height: 12),
+                        Text(
+                          '¡Subiste a ${_newRank!.label}!',
+                          style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                                color: AppStyles.rankColor(_newRank!),
+                                fontWeight: FontWeight.bold,
+                              ),
+                        ),
+                      ],
+                    ),
+                  )
+                else
+                  Icon(
+                    Icons.check_circle,
+                    size: 80,
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
                 const SizedBox(height: 16),
-                Text(
-                  '¡Completado!',
-                  style: Theme.of(context).textTheme.headlineSmall,
-                ),
+                if (!_rankedUp)
+                  Text(
+                    '¡Completado!',
+                    style: Theme.of(context).textTheme.headlineSmall,
+                  ),
                 const SizedBox(height: 8),
                 Text(
                   'Practicaste "${widget.exercise.title}".',

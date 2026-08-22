@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import '../data/exercises_data.dart';
 import '../data/local_db.dart';
@@ -43,21 +42,6 @@ class _RouteScreenState extends State<RouteScreen> {
     });
   }
 
-  Color _rankColor(ExerciseRank rank) {
-    switch (rank) {
-      case ExerciseRank.cobre:
-        return const Color(0xFFB5722C);
-      case ExerciseRank.plata:
-        return const Color(0xFF9AA0A6);
-      case ExerciseRank.oro:
-        return const Color(0xFFCF9A2E);
-      case ExerciseRank.platino:
-        return const Color(0xFF5B8DB8);
-      case ExerciseRank.diamante:
-        return const Color(0xFF3FBFB0);
-    }
-  }
-
   Future<void> _openExercise(Exercise exercise) async {
     final completed = await Navigator.push<bool>(
       context,
@@ -90,7 +74,7 @@ class _RouteScreenState extends State<RouteScreen> {
         ),
       );
     } else {
-      final color = timesCompleted > 0 ? _rankColor(rank) : Theme.of(context).colorScheme.primary;
+      final color = timesCompleted > 0 ? AppStyles.rankColor(rank) : Theme.of(context).colorScheme.primary;
       node = Container(
         width: 64,
         height: 64,
@@ -99,7 +83,7 @@ class _RouteScreenState extends State<RouteScreen> {
           color: color,
         ),
         child: Icon(
-          timesCompleted > 0 ? Icons.check : Icons.play_arrow,
+          timesCompleted > 0 ? Icons.emoji_events : Icons.play_arrow,
           color: Colors.white,
           size: 28,
         ),
@@ -130,14 +114,31 @@ class _RouteScreenState extends State<RouteScreen> {
               overflow: TextOverflow.ellipsis,
             ),
           ),
-          if (unlocked && timesCompleted > 0)
+          if (unlocked && timesCompleted > 0) ...[
             Text(
               rank.label,
               style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                    color: _rankColor(rank),
+                    color: AppStyles.rankColor(rank),
                     fontWeight: FontWeight.bold,
                   ),
             ),
+            if (progress!.repsToNextRank > 0)
+              Text(
+                '${progress.repsToNextRank} para subir',
+                style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      fontSize: 10,
+                    ),
+              )
+            else
+              Text(
+                'Rango máximo',
+                style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      fontSize: 10,
+                    ),
+              ),
+          ],
         ],
       ),
     );

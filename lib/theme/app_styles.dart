@@ -18,6 +18,21 @@ class AppStyles {
     }
   }
 
+  static Color rankColor(ExerciseRank rank) {
+    switch (rank) {
+      case ExerciseRank.cobre:
+        return const Color(0xFFB87333);
+      case ExerciseRank.plata:
+        return const Color(0xFFC0C0C8);
+      case ExerciseRank.oro:
+        return const Color(0xFFE6B325);
+      case ExerciseRank.platino:
+        return const Color(0xFF6FA8DC);
+      case ExerciseRank.diamante:
+        return const Color(0xFF4FD9E8);
+    }
+  }
+
   static ShapeBorder cardShape() {
     return RoundedRectangleBorder(borderRadius: BorderRadius.circular(cardRadius));
   }
