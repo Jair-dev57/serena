@@ -47,8 +47,7 @@ app.*.map.json
 # Widget Preview related
 .widget_preview/
 
-# Backend (Python)
+# Backend (Dart Frog)
 backend/.env
-backend/__pycache__/
-backend/**/__pycache__/
-backend/.venv/
+backend/.dart_frog/
+backend/build/
