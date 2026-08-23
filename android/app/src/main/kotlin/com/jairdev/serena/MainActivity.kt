@@ -1,4 +1,4 @@
-package com.example.fluidez_app
+package com.jairdev.serena
 
 import io.flutter.embedding.android.FlutterActivity
 

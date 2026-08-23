@@ -15,7 +15,7 @@ class LocalDb {
 
   Future<Database> _initDb() async {
     final dbPath = await getDatabasesPath();
-    final path = join(dbPath, 'fluidez_app.db');
+    final path = join(dbPath, 'serena.db');
     return openDatabase(
       path,
       version: 6,

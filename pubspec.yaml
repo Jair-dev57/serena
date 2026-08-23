@@ -1,4 +1,4 @@
-name: fluidez_app
+name: serena
 description: "A new Flutter project."
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
@@ -40,6 +40,7 @@ dependencies:
   path: ^1.9.0
   shared_preferences: ^2.5.5
   lottie: ^3.5.1
+  path_provider: ^2.1.5
 
 
 dev_dependencies:
