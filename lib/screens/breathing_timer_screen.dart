@@ -25,6 +25,8 @@ class _BreathingTimerScreenState extends State<BreathingTimerScreen>
   int _secondsRemaining = 0;
   Timer? _countdownTimer;
 
+  final ExpansibleController _stepsController = ExpansibleController();
+
   late final AnimationController _breathController;
   late final BreathingPattern _pattern;
 
@@ -47,6 +49,17 @@ class _BreathingTimerScreenState extends State<BreathingTimerScreen>
     _countdownTimer?.cancel();
     _breathController.dispose();
     super.dispose();
+  }
+
+  void _collapseStepsIfNeeded() {
+    if (_stepsController.isExpanded) {
+      _stepsController.collapse();
+    }
+  }
+
+  void _selectDuration(int minutes) {
+    setState(() => _selectedMinutes = minutes);
+    _collapseStepsIfNeeded();
   }
 
   void _startSession(int minutes) {
@@ -141,9 +154,20 @@ class _BreathingTimerScreenState extends State<BreathingTimerScreen>
     return '$m:$s';
   }
 
+  Widget _sectionHeader(IconData icon, String label) {
+    return Row(
+      children: [
+        Icon(icon, size: 20, color: Theme.of(context).colorScheme.primary),
+        const SizedBox(width: 8),
+        Text(label, style: Theme.of(context).textTheme.titleMedium),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     if (_completed) {
+      final totalSeconds = (_selectedMinutes ?? 0) * 60;
       return Scaffold(
         appBar: AppBar(title: Text(widget.exercise.title)),
         body: Center(
@@ -168,7 +192,7 @@ class _BreathingTimerScreenState extends State<BreathingTimerScreen>
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'Practicaste "${widget.exercise.title}".',
+                  'Practicaste "${widget.exercise.title}" durante ${_formatTime(totalSeconds)}.',
                   textAlign: TextAlign.center,
                   style: Theme.of(context).textTheme.bodyMedium,
                 ),
@@ -204,18 +228,28 @@ class _BreathingTimerScreenState extends State<BreathingTimerScreen>
                             ),
                       ),
                       const SizedBox(height: 20),
-                      Text(
-                        'Pasos',
-                        style: Theme.of(context).textTheme.titleMedium,
+                      Theme(
+                        data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+                        child: ExpansionTile(
+                          controller: _stepsController,
+                          initiallyExpanded: true,
+                          tilePadding: EdgeInsets.zero,
+                          childrenPadding: const EdgeInsets.only(top: 4),
+                          title: Row(
+                            children: [
+                              Icon(Icons.list_alt, size: 20, color: Theme.of(context).colorScheme.primary),
+                              const SizedBox(width: 8),
+                              Text('Pasos', style: Theme.of(context).textTheme.titleMedium),
+                            ],
+                          ),
+                          children: [
+                            for (int i = 0; i < widget.exercise.steps.length; i++)
+                              StepCard(number: i + 1, text: widget.exercise.steps[i]),
+                          ],
+                        ),
                       ),
-                      const SizedBox(height: 10),
-                      for (int i = 0; i < widget.exercise.steps.length; i++)
-                        StepCard(number: i + 1, text: widget.exercise.steps[i]),
                       const SizedBox(height: 20),
-                      Text(
-                        'Elige cuánto quieres practicar',
-                        style: Theme.of(context).textTheme.titleMedium,
-                      ),
+                      _sectionHeader(Icons.timer_outlined, 'Elige cuánto quieres practicar'),
                       const SizedBox(height: 12),
                       Wrap(
                         spacing: 8,
@@ -223,7 +257,7 @@ class _BreathingTimerScreenState extends State<BreathingTimerScreen>
                           return ChoiceChip(
                             label: Text('$min min'),
                             selected: _selectedMinutes == min,
-                            onSelected: (_) => setState(() => _selectedMinutes = min),
+                            onSelected: (_) => _selectDuration(min),
                           );
                         }).toList(),
                       ),
@@ -247,13 +281,58 @@ class _BreathingTimerScreenState extends State<BreathingTimerScreen>
       );
     }
 
+    final totalSeconds = (_selectedMinutes ?? 1) * 60;
+    final elapsedSeconds = totalSeconds - _secondsRemaining;
+
     return Scaffold(
       appBar: AppBar(title: Text(widget.exercise.title)),
       body: Padding(
         padding: const EdgeInsets.all(24),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
           children: [
+            Card(
+              elevation: 0,
+              color: Theme.of(context).colorScheme.surfaceContainerLow,
+              shape: AppStyles.cardShape(),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                child: Column(
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Row(
+                          children: [
+                            Icon(
+                              Icons.timer_outlined,
+                              size: 18,
+                              color: Theme.of(context).colorScheme.onSurfaceVariant,
+                            ),
+                            const SizedBox(width: 6),
+                            Text(_formatTime(elapsedSeconds), style: Theme.of(context).textTheme.labelLarge),
+                          ],
+                        ),
+                        Text(
+                          'de $_selectedMinutes:00',
+                          style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                                color: Theme.of(context).colorScheme.onSurfaceVariant,
+                              ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(8),
+                      child: LinearProgressIndicator(
+                        value: totalSeconds == 0 ? 0 : elapsedSeconds / totalSeconds,
+                        minHeight: 6,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const Spacer(),
             AnimatedBuilder(
               animation: _breathController,
               builder: (context, child) {
@@ -299,12 +378,12 @@ class _BreathingTimerScreenState extends State<BreathingTimerScreen>
               style: Theme.of(context).textTheme.displaySmall,
             ),
             Text(
-              'restantes de ${_selectedMinutes}:00',
+              'restantes',
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
                     color: Theme.of(context).colorScheme.onSurfaceVariant,
                   ),
             ),
-            const SizedBox(height: 32),
+            const Spacer(),
             SizedBox(
               width: double.infinity,
               child: OutlinedButton.icon(
