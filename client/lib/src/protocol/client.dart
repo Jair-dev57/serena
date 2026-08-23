@@ -16,14 +16,19 @@ import 'package:serverpod_client/serverpod_client.dart' as _i2;
 import 'dart:async' as _i3;
 import 'package:serverpod_auth_core_client/serverpod_auth_core_client.dart'
     as _i4;
-import 'package:serena_poc_client/src/protocol/block_entry.dart' as _i5;
-import 'package:serena_poc_client/src/protocol/block_severity.dart' as _i6;
-import 'package:serena_poc_client/src/protocol/block_context.dart' as _i7;
-import 'package:serena_poc_client/src/protocol/difficult_word.dart' as _i8;
-import 'package:serena_poc_client/src/protocol/exercise_progress.dart' as _i9;
-import 'package:serena_poc_client/src/protocol/practice_session.dart' as _i10;
-import 'package:serena_poc_client/src/protocol/greetings/greeting.dart' as _i11;
-import 'protocol.dart' as _i12;
+import 'package:serena_poc_client/src/protocol/block/block_entry.dart' as _i5;
+import 'package:serena_poc_client/src/protocol/block/block_severity.dart'
+    as _i6;
+import 'package:serena_poc_client/src/protocol/block/block_context.dart' as _i7;
+import 'package:serena_poc_client/src/protocol/difficult_word/difficult_word.dart'
+    as _i8;
+import 'package:serena_poc_client/src/protocol/exercise/exercise.dart' as _i9;
+import 'package:serena_poc_client/src/protocol/exercise_progress/exercise_progress.dart'
+    as _i10;
+import 'package:serena_poc_client/src/protocol/practice_session/practice_session.dart'
+    as _i11;
+import 'package:serena_poc_client/src/protocol/greetings/greeting.dart' as _i12;
+import 'protocol.dart' as _i13;
 
 /// By extending [EmailIdpBaseEndpoint], the email identity provider endpoints
 /// are made available on the server and enable the corresponding sign-in widget
@@ -331,28 +336,52 @@ class EndpointDifficultWord extends _i2.EndpointRef {
 }
 
 /// {@category Endpoint}
+class EndpointExercise extends _i2.EndpointRef {
+  EndpointExercise(_i2.EndpointCaller caller) : super(caller);
+
+  @override
+  String get name => 'exercise';
+
+  _i3.Future<List<_i9.Exercise>> getAllExercises() =>
+      caller.callServerEndpoint<List<_i9.Exercise>>(
+        'exercise',
+        'getAllExercises',
+        {},
+      );
+
+  /// Inserta el catálogo completo solo si la tabla está vacía.
+  /// Seguro de llamar varias veces: si ya hay datos, no hace nada.
+  _i3.Future<String> seedIfEmpty() => caller.callServerEndpoint<String>(
+    'exercise',
+    'seedIfEmpty',
+    {},
+  );
+}
+
+/// {@category Endpoint}
 class EndpointExerciseProgress extends _i2.EndpointRef {
   EndpointExerciseProgress(_i2.EndpointCaller caller) : super(caller);
 
   @override
   String get name => 'exerciseProgress';
 
-  _i3.Future<List<_i9.ExerciseProgress>> getAllProgress() =>
-      caller.callServerEndpoint<List<_i9.ExerciseProgress>>(
+  _i3.Future<List<_i10.ExerciseProgress>> getAllProgress() =>
+      caller.callServerEndpoint<List<_i10.ExerciseProgress>>(
         'exerciseProgress',
         'getAllProgress',
         {},
       );
 
-  _i3.Future<_i9.ExerciseProgress?> getProgressForExercise(String exerciseId) =>
-      caller.callServerEndpoint<_i9.ExerciseProgress?>(
-        'exerciseProgress',
-        'getProgressForExercise',
-        {'exerciseId': exerciseId},
-      );
+  _i3.Future<_i10.ExerciseProgress?> getProgressForExercise(
+    String exerciseId,
+  ) => caller.callServerEndpoint<_i10.ExerciseProgress?>(
+    'exerciseProgress',
+    'getProgressForExercise',
+    {'exerciseId': exerciseId},
+  );
 
-  _i3.Future<_i9.ExerciseProgress> incrementProgress(String exerciseId) =>
-      caller.callServerEndpoint<_i9.ExerciseProgress>(
+  _i3.Future<_i10.ExerciseProgress> incrementProgress(String exerciseId) =>
+      caller.callServerEndpoint<_i10.ExerciseProgress>(
         'exerciseProgress',
         'incrementProgress',
         {'exerciseId': exerciseId},
@@ -366,17 +395,17 @@ class EndpointPracticeSession extends _i2.EndpointRef {
   @override
   String get name => 'practiceSession';
 
-  _i3.Future<List<_i10.PracticeSession>> getAllSessions() =>
-      caller.callServerEndpoint<List<_i10.PracticeSession>>(
+  _i3.Future<List<_i11.PracticeSession>> getAllSessions() =>
+      caller.callServerEndpoint<List<_i11.PracticeSession>>(
         'practiceSession',
         'getAllSessions',
         {},
       );
 
-  _i3.Future<_i10.PracticeSession> insertSession(
+  _i3.Future<_i11.PracticeSession> insertSession(
     String exerciseTitle,
     DateTime date,
-  ) => caller.callServerEndpoint<_i10.PracticeSession>(
+  ) => caller.callServerEndpoint<_i11.PracticeSession>(
     'practiceSession',
     'insertSession',
     {
@@ -402,8 +431,8 @@ class EndpointGreeting extends _i2.EndpointRef {
   String get name => 'greeting';
 
   /// Returns a personalized greeting message: "Hello {name}".
-  _i3.Future<_i11.Greeting> hello(String name) =>
-      caller.callServerEndpoint<_i11.Greeting>(
+  _i3.Future<_i12.Greeting> hello(String name) =>
+      caller.callServerEndpoint<_i12.Greeting>(
         'greeting',
         'hello',
         {'name': name},
@@ -441,7 +470,7 @@ class Client extends _i2.ServerpodClientShared {
     bool? disconnectStreamsOnLostInternetConnection,
   }) : super(
          host,
-         _i12.Protocol(),
+         _i13.Protocol(),
          securityContext: securityContext,
          streamingConnectionTimeout: streamingConnectionTimeout,
          connectionTimeout: connectionTimeout,
@@ -454,6 +483,7 @@ class Client extends _i2.ServerpodClientShared {
     jwtRefresh = EndpointJwtRefresh(this);
     blockEntry = EndpointBlockEntry(this);
     difficultWord = EndpointDifficultWord(this);
+    exercise = EndpointExercise(this);
     exerciseProgress = EndpointExerciseProgress(this);
     practiceSession = EndpointPracticeSession(this);
     greeting = EndpointGreeting(this);
@@ -467,6 +497,8 @@ class Client extends _i2.ServerpodClientShared {
   late final EndpointBlockEntry blockEntry;
 
   late final EndpointDifficultWord difficultWord;
+
+  late final EndpointExercise exercise;
 
   late final EndpointExerciseProgress exerciseProgress;
 
@@ -482,6 +514,7 @@ class Client extends _i2.ServerpodClientShared {
     'jwtRefresh': jwtRefresh,
     'blockEntry': blockEntry,
     'difficultWord': difficultWord,
+    'exercise': exercise,
     'exerciseProgress': exerciseProgress,
     'practiceSession': practiceSession,
     'greeting': greeting,

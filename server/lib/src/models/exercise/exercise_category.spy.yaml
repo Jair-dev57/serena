@@ -1,0 +1,6 @@
+enum: ExerciseCategory
+values:
+  - respiracion
+  - inicioSuave
+  - ritmo
+  - lectura

@@ -3,11 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:record/record.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:path_provider/path_provider.dart';
-import '../data/local_db.dart';
 import '../data/recording_manager.dart';
 import '../models/exercise.dart';
 import '../theme/app_styles.dart';
 import '../data/server_client.dart';
+
 class RecorderWidget extends StatefulWidget {
   final String exerciseId;
   final String exerciseTitle;

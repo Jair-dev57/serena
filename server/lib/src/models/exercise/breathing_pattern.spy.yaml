@@ -1,0 +1,5 @@
+class: BreathingPattern
+fields:
+  inhaleSeconds: int
+  holdSeconds: int
+  exhaleSeconds: int

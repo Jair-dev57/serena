@@ -15,17 +15,21 @@ import '../auth/email_idp_endpoint.dart' as _i2;
 import '../auth/jwt_refresh_endpoint.dart' as _i3;
 import '../endpoints/block_entry_endpoint.dart' as _i4;
 import '../endpoints/difficult_word_endpoint.dart' as _i5;
-import '../endpoints/exercise_progress_endpoint.dart' as _i6;
-import '../endpoints/practice_session_endpoint.dart' as _i7;
-import '../greetings/greeting_endpoint.dart' as _i8;
-import 'package:serena_poc_server/src/generated/block_severity.dart' as _i9;
-import 'package:serena_poc_server/src/generated/block_context.dart' as _i10;
-import 'package:serena_poc_server/src/generated/block_entry.dart' as _i11;
-import 'package:serena_poc_server/src/generated/difficult_word.dart' as _i12;
-import 'package:serverpod_auth_idp_server/serverpod_auth_idp_server.dart'
+import '../endpoints/exercise_endpoint.dart' as _i6;
+import '../endpoints/exercise_progress_endpoint.dart' as _i7;
+import '../endpoints/practice_session_endpoint.dart' as _i8;
+import '../greetings/greeting_endpoint.dart' as _i9;
+import 'package:serena_poc_server/src/generated/block/block_severity.dart'
+    as _i10;
+import 'package:serena_poc_server/src/generated/block/block_context.dart'
+    as _i11;
+import 'package:serena_poc_server/src/generated/block/block_entry.dart' as _i12;
+import 'package:serena_poc_server/src/generated/difficult_word/difficult_word.dart'
     as _i13;
-import 'package:serverpod_auth_core_server/serverpod_auth_core_server.dart'
+import 'package:serverpod_auth_idp_server/serverpod_auth_idp_server.dart'
     as _i14;
+import 'package:serverpod_auth_core_server/serverpod_auth_core_server.dart'
+    as _i15;
 
 class Endpoints extends _i1.EndpointDispatch {
   @override
@@ -55,19 +59,25 @@ class Endpoints extends _i1.EndpointDispatch {
           'difficultWord',
           null,
         ),
-      'exerciseProgress': _i6.ExerciseProgressEndpoint()
+      'exercise': _i6.ExerciseEndpoint()
+        ..initialize(
+          server,
+          'exercise',
+          null,
+        ),
+      'exerciseProgress': _i7.ExerciseProgressEndpoint()
         ..initialize(
           server,
           'exerciseProgress',
           null,
         ),
-      'practiceSession': _i7.PracticeSessionEndpoint()
+      'practiceSession': _i8.PracticeSessionEndpoint()
         ..initialize(
           server,
           'practiceSession',
           null,
         ),
-      'greeting': _i8.GreetingEndpoint()
+      'greeting': _i9.GreetingEndpoint()
         ..initialize(
           server,
           'greeting',
@@ -302,12 +312,12 @@ class Endpoints extends _i1.EndpointDispatch {
             ),
             'severity': _i1.ParameterDescription(
               name: 'severity',
-              type: _i1.getType<_i9.BlockSeverity>(),
+              type: _i1.getType<_i10.BlockSeverity>(),
               nullable: false,
             ),
             'context': _i1.ParameterDescription(
               name: 'context',
-              type: _i1.getType<_i10.BlockContext>(),
+              type: _i1.getType<_i11.BlockContext>(),
               nullable: false,
             ),
             'note': _i1.ParameterDescription(
@@ -334,7 +344,7 @@ class Endpoints extends _i1.EndpointDispatch {
           params: {
             'entry': _i1.ParameterDescription(
               name: 'entry',
-              type: _i1.getType<_i11.BlockEntry>(),
+              type: _i1.getType<_i12.BlockEntry>(),
               nullable: false,
             ),
           },
@@ -415,7 +425,7 @@ class Endpoints extends _i1.EndpointDispatch {
           params: {
             'word': _i1.ParameterDescription(
               name: 'word',
-              type: _i1.getType<_i12.DifficultWord>(),
+              type: _i1.getType<_i13.DifficultWord>(),
               nullable: false,
             ),
           },
@@ -452,6 +462,32 @@ class Endpoints extends _i1.EndpointDispatch {
         ),
       },
     );
+    connectors['exercise'] = _i1.EndpointConnector(
+      name: 'exercise',
+      endpoint: endpoints['exercise']!,
+      methodConnectors: {
+        'getAllExercises': _i1.MethodConnector(
+          name: 'getAllExercises',
+          params: {},
+          call:
+              (
+                _i1.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['exercise'] as _i6.ExerciseEndpoint)
+                  .getAllExercises(session),
+        ),
+        'seedIfEmpty': _i1.MethodConnector(
+          name: 'seedIfEmpty',
+          params: {},
+          call:
+              (
+                _i1.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['exercise'] as _i6.ExerciseEndpoint)
+                  .seedIfEmpty(session),
+        ),
+      },
+    );
     connectors['exerciseProgress'] = _i1.EndpointConnector(
       name: 'exerciseProgress',
       endpoint: endpoints['exerciseProgress']!,
@@ -465,7 +501,7 @@ class Endpoints extends _i1.EndpointDispatch {
                 Map<String, dynamic> params,
               ) async =>
                   (endpoints['exerciseProgress']
-                          as _i6.ExerciseProgressEndpoint)
+                          as _i7.ExerciseProgressEndpoint)
                       .getAllProgress(session),
         ),
         'getProgressForExercise': _i1.MethodConnector(
@@ -483,7 +519,7 @@ class Endpoints extends _i1.EndpointDispatch {
                 Map<String, dynamic> params,
               ) async =>
                   (endpoints['exerciseProgress']
-                          as _i6.ExerciseProgressEndpoint)
+                          as _i7.ExerciseProgressEndpoint)
                       .getProgressForExercise(
                         session,
                         params['exerciseId'],
@@ -504,7 +540,7 @@ class Endpoints extends _i1.EndpointDispatch {
                 Map<String, dynamic> params,
               ) async =>
                   (endpoints['exerciseProgress']
-                          as _i6.ExerciseProgressEndpoint)
+                          as _i7.ExerciseProgressEndpoint)
                       .incrementProgress(
                         session,
                         params['exerciseId'],
@@ -524,7 +560,7 @@ class Endpoints extends _i1.EndpointDispatch {
                 _i1.Session session,
                 Map<String, dynamic> params,
               ) async =>
-                  (endpoints['practiceSession'] as _i7.PracticeSessionEndpoint)
+                  (endpoints['practiceSession'] as _i8.PracticeSessionEndpoint)
                       .getAllSessions(session),
         ),
         'insertSession': _i1.MethodConnector(
@@ -546,7 +582,7 @@ class Endpoints extends _i1.EndpointDispatch {
                 _i1.Session session,
                 Map<String, dynamic> params,
               ) async =>
-                  (endpoints['practiceSession'] as _i7.PracticeSessionEndpoint)
+                  (endpoints['practiceSession'] as _i8.PracticeSessionEndpoint)
                       .insertSession(
                         session,
                         params['exerciseTitle'],
@@ -561,7 +597,7 @@ class Endpoints extends _i1.EndpointDispatch {
                 _i1.Session session,
                 Map<String, dynamic> params,
               ) async =>
-                  (endpoints['practiceSession'] as _i7.PracticeSessionEndpoint)
+                  (endpoints['practiceSession'] as _i8.PracticeSessionEndpoint)
                       .getCurrentStreak(session),
         ),
       },
@@ -583,16 +619,16 @@ class Endpoints extends _i1.EndpointDispatch {
               (
                 _i1.Session session,
                 Map<String, dynamic> params,
-              ) async => (endpoints['greeting'] as _i8.GreetingEndpoint).hello(
+              ) async => (endpoints['greeting'] as _i9.GreetingEndpoint).hello(
                 session,
                 params['name'],
               ),
         ),
       },
     );
-    modules['serverpod_auth_idp'] = _i13.Endpoints()
+    modules['serverpod_auth_idp'] = _i14.Endpoints()
       ..initializeEndpoints(server);
-    modules['serverpod_auth_core'] = _i14.Endpoints()
+    modules['serverpod_auth_core'] = _i15.Endpoints()
       ..initializeEndpoints(server);
   }
 }

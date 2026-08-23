@@ -11,8 +11,8 @@
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod_client/serverpod_client.dart' as _i1;
-import 'block_severity.dart' as _i2;
-import 'block_context.dart' as _i3;
+import '../block/block_severity.dart' as _i2;
+import '../block/block_context.dart' as _i3;
 
 abstract class BlockEntry implements _i1.SerializableModel {
   BlockEntry._({

@@ -1,0 +1,16 @@
+class: Exercise
+table: exercise
+fields:
+  exerciseKey: String
+  title: String
+  category: ExerciseCategory
+  description: String
+  steps: List<String>
+  difficulty: ExerciseDifficulty
+  durationMinutes: int
+  tags: List<String>
+  breathingPattern: BreathingPattern?
+indexes:
+  exercise_key_unique:
+    fields: exerciseKey
+    unique: true

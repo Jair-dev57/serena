@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import '../data/local_db.dart';
 import '../data/warmup_data.dart';
 import '../models/exercise.dart';
 import '../theme/app_styles.dart';

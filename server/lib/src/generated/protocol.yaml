@@ -19,6 +19,9 @@ difficultWord:
   - createWord:
   - updateWord:
   - deleteWord:
+exercise:
+  - getAllExercises:
+  - seedIfEmpty:
 exerciseProgress:
   - getAllProgress:
   - getProgressForExercise:

@@ -1,0 +1,5 @@
+enum: ExerciseDifficulty
+values:
+  - principiante
+  - intermedio
+  - avanzado

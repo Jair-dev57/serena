@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:serena_poc_client/serena_poc_client.dart' show DifficultWord;
 import '../data/server_client.dart';
 import '../models/exercise.dart' hide DifficultWord;
-import '../data/exercises_data.dart';
+import '../data/exercises_repository.dart';
 import '../data/exercise_path_logic.dart';
 import 'guided_exercise_screen.dart';
 import 'breathing_timer_screen.dart';
@@ -18,6 +18,7 @@ class DifficultWordsScreen extends StatefulWidget {
 
 class _DifficultWordsScreenState extends State<DifficultWordsScreen> {
   List<DifficultWord> _words = [];
+  List<Exercise> _exercises = [];
   bool _isSearching = false;
   String _searchQuery = '';
   final TextEditingController _searchController = TextEditingController();
@@ -44,8 +45,10 @@ class _DifficultWordsScreenState extends State<DifficultWordsScreen> {
 
   Future<void> _loadWords() async {
     final words = await ServerClient.instance.difficultWord.getAllWords();
+    final exercises = await ExercisesRepository.load();
     setState(() {
       _words = words;
+      _exercises = exercises;
     });
   }
 
@@ -208,7 +211,7 @@ class _DifficultWordsScreenState extends State<DifficultWordsScreen> {
     final progressById = {for (final p in allProgress) p.exerciseId: p};
 
     final recommended = ExercisePathLogic.nextRecommendedExercise(
-      exercises,
+      _exercises,
       _orderedCategories,
       progressById,
     );
@@ -288,7 +291,7 @@ class _DifficultWordsScreenState extends State<DifficultWordsScreen> {
                   style: Theme.of(context).textTheme.titleMedium,
                 ),
               ),
-              for (final exercise in exercises)
+              for (final exercise in _exercises)
                 ListTile(
                   title: Text(exercise.title),
                   subtitle: Text(exercise.category.label),

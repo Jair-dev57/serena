@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../data/exercises_data.dart';
+import '../data/exercises_repository.dart';
 import '../data/server_client.dart';
 import '../data/exercise_path_logic.dart';
 import '../data/weekly_goal_manager.dart';
@@ -25,6 +25,7 @@ class RouteScreen extends StatefulWidget {
 
 class _RouteScreenState extends State<RouteScreen> {
   Map<String, ExerciseProgress> _progressById = {};
+  List<Exercise> _exercises = [];
   bool _loading = true;
   int _streak = 0;
   bool _hasRecentStrongBlock = false;
@@ -45,12 +46,14 @@ class _RouteScreenState extends State<RouteScreen> {
   }
 
   Future<void> _loadProgress() async {
+    final exercises = await ExercisesRepository.load();
     final allProgress = await ServerClient.instance.exerciseProgress.getAllProgress();
     final streak = await ServerClient.instance.practiceSession.getCurrentStreak();
     final blockEntries = await ServerClient.instance.blockEntry.getAllEntries();
     final sessions = await ServerClient.instance.practiceSession.getAllSessions();
     final weeklyTarget = await WeeklyGoalManager.getTarget();
     setState(() {
+      _exercises = exercises;
       _progressById = {for (final p in allProgress) p.exerciseId: p};
       _streak = streak;
       _hasRecentStrongBlock = ExercisePathLogic.hasRecentStrongBlock(blockEntries);
@@ -59,7 +62,7 @@ class _RouteScreenState extends State<RouteScreen> {
       _loading = false;
     });
   }
-
+  
   Future<void> _onWeeklyTargetChanged(int newTarget) async {
     await WeeklyGoalManager.setTarget(newTarget);
     setState(() {
@@ -67,10 +70,10 @@ class _RouteScreenState extends State<RouteScreen> {
     });
   }
 
-  int get _totalExercises => exercises.length;
+  int get _totalExercises => _exercises.length;
 
   int get _completedExercises =>
-      exercises.where((e) => (_progressById[e.id]?.timesCompleted ?? 0) > 0).length;
+    _exercises.where((e) => (_progressById[e.id]?.timesCompleted ?? 0) > 0).length;
 
   Future<void> _openExercise(Exercise exercise) async {
     final isBreathing = exercise.category == ExerciseCategory.respiracion;
@@ -89,7 +92,7 @@ class _RouteScreenState extends State<RouteScreen> {
 
   void _practiceRespiracion() {
     final respiracionExercises = ExercisePathLogic.exercisesForCategory(
-      exercises,
+      _exercises,
       ExerciseCategory.respiracion,
     );
     final recommended = respiracionExercises.firstWhere(
@@ -243,7 +246,7 @@ class _RouteScreenState extends State<RouteScreen> {
   }
 
   Widget _buildCategorySection(ExerciseCategory category, bool categoryUnlocked) {
-    final categoryExercises = ExercisePathLogic.exercisesForCategory(exercises, category);
+    final categoryExercises = ExercisePathLogic.exercisesForCategory(_exercises, category);
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 24),
@@ -308,7 +311,7 @@ class _RouteScreenState extends State<RouteScreen> {
 
     final exercisesByCategory = <ExerciseCategory, List<Exercise>>{
       for (final category in _orderedCategories)
-        category: ExercisePathLogic.exercisesForCategory(exercises, category),
+        category: ExercisePathLogic.exercisesForCategory(_exercises, category),
     };
 
     final goalAchieved = _sessionsThisWeek >= _weeklyTarget;

@@ -16,24 +16,36 @@ import 'package:serverpod_auth_idp_server/serverpod_auth_idp_server.dart'
     as _i3;
 import 'package:serverpod_auth_core_server/serverpod_auth_core_server.dart'
     as _i4;
-import 'block_context.dart' as _i5;
-import 'block_entry.dart' as _i6;
-import 'block_severity.dart' as _i7;
-import 'difficult_word.dart' as _i8;
-import 'exercise_progress.dart' as _i9;
-import 'greetings/greeting.dart' as _i10;
-import 'practice_session.dart' as _i11;
-import 'package:serena_poc_server/src/generated/block_entry.dart' as _i12;
-import 'package:serena_poc_server/src/generated/difficult_word.dart' as _i13;
-import 'package:serena_poc_server/src/generated/exercise_progress.dart' as _i14;
-import 'package:serena_poc_server/src/generated/practice_session.dart' as _i15;
-export 'block_context.dart';
-export 'block_entry.dart';
-export 'block_severity.dart';
-export 'difficult_word.dart';
-export 'exercise_progress.dart';
+import 'block/block_context.dart' as _i5;
+import 'block/block_entry.dart' as _i6;
+import 'block/block_severity.dart' as _i7;
+import 'difficult_word/difficult_word.dart' as _i8;
+import 'exercise/breathing_pattern.dart' as _i9;
+import 'exercise/exercise.dart' as _i10;
+import 'exercise/exercise_category.dart' as _i11;
+import 'exercise/exercise_difficulty.dart' as _i12;
+import 'exercise_progress/exercise_progress.dart' as _i13;
+import 'greetings/greeting.dart' as _i14;
+import 'practice_session/practice_session.dart' as _i15;
+import 'package:serena_poc_server/src/generated/block/block_entry.dart' as _i16;
+import 'package:serena_poc_server/src/generated/difficult_word/difficult_word.dart'
+    as _i17;
+import 'package:serena_poc_server/src/generated/exercise/exercise.dart' as _i18;
+import 'package:serena_poc_server/src/generated/exercise_progress/exercise_progress.dart'
+    as _i19;
+import 'package:serena_poc_server/src/generated/practice_session/practice_session.dart'
+    as _i20;
+export 'block/block_context.dart';
+export 'block/block_entry.dart';
+export 'block/block_severity.dart';
+export 'difficult_word/difficult_word.dart';
+export 'exercise/breathing_pattern.dart';
+export 'exercise/exercise.dart';
+export 'exercise/exercise_category.dart';
+export 'exercise/exercise_difficulty.dart';
+export 'exercise_progress/exercise_progress.dart';
 export 'greetings/greeting.dart';
-export 'practice_session.dart';
+export 'practice_session/practice_session.dart';
 
 class Protocol extends _i1.SerializationManagerServer {
   Protocol._();
@@ -145,6 +157,105 @@ class Protocol extends _i1.SerializationManagerServer {
           type: 'btree',
           isUnique: true,
           isPrimary: true,
+        ),
+      ],
+      managed: true,
+    ),
+    _i2.TableDefinition(
+      name: 'exercise',
+      dartName: 'Exercise',
+      schema: 'public',
+      module: 'serena_poc',
+      columns: [
+        _i2.ColumnDefinition(
+          name: 'id',
+          columnType: _i2.ColumnType.bigint,
+          isNullable: false,
+          dartType: 'int?',
+          columnDefault: 'nextval(\'exercise_id_seq\'::regclass)',
+        ),
+        _i2.ColumnDefinition(
+          name: 'exerciseKey',
+          columnType: _i2.ColumnType.text,
+          isNullable: false,
+          dartType: 'String',
+        ),
+        _i2.ColumnDefinition(
+          name: 'title',
+          columnType: _i2.ColumnType.text,
+          isNullable: false,
+          dartType: 'String',
+        ),
+        _i2.ColumnDefinition(
+          name: 'category',
+          columnType: _i2.ColumnType.text,
+          isNullable: false,
+          dartType: 'protocol:ExerciseCategory',
+        ),
+        _i2.ColumnDefinition(
+          name: 'description',
+          columnType: _i2.ColumnType.text,
+          isNullable: false,
+          dartType: 'String',
+        ),
+        _i2.ColumnDefinition(
+          name: 'steps',
+          columnType: _i2.ColumnType.json,
+          isNullable: false,
+          dartType: 'List<String>',
+        ),
+        _i2.ColumnDefinition(
+          name: 'difficulty',
+          columnType: _i2.ColumnType.text,
+          isNullable: false,
+          dartType: 'protocol:ExerciseDifficulty',
+        ),
+        _i2.ColumnDefinition(
+          name: 'durationMinutes',
+          columnType: _i2.ColumnType.bigint,
+          isNullable: false,
+          dartType: 'int',
+        ),
+        _i2.ColumnDefinition(
+          name: 'tags',
+          columnType: _i2.ColumnType.json,
+          isNullable: false,
+          dartType: 'List<String>',
+        ),
+        _i2.ColumnDefinition(
+          name: 'breathingPattern',
+          columnType: _i2.ColumnType.json,
+          isNullable: true,
+          dartType: 'protocol:BreathingPattern?',
+        ),
+      ],
+      foreignKeys: [],
+      indexes: [
+        _i2.IndexDefinition(
+          indexName: 'exercise_pkey',
+          tableSpace: null,
+          elements: [
+            _i2.IndexElementDefinition(
+              type: _i2.IndexElementDefinitionType.column,
+              definition: 'id',
+            ),
+          ],
+          type: 'btree',
+          isUnique: true,
+          isPrimary: true,
+        ),
+        _i2.IndexDefinition(
+          indexName: 'exercise_key_unique',
+          tableSpace: null,
+          elements: [
+            _i2.IndexElementDefinition(
+              type: _i2.IndexElementDefinitionType.column,
+              definition: 'exerciseKey',
+            ),
+          ],
+          type: 'btree',
+          isUnique: true,
+          isPrimary: false,
         ),
       ],
       managed: true,
@@ -300,14 +411,26 @@ class Protocol extends _i1.SerializationManagerServer {
     if (t == _i8.DifficultWord) {
       return _i8.DifficultWord.fromJson(data) as T;
     }
-    if (t == _i9.ExerciseProgress) {
-      return _i9.ExerciseProgress.fromJson(data) as T;
+    if (t == _i9.BreathingPattern) {
+      return _i9.BreathingPattern.fromJson(data) as T;
     }
-    if (t == _i10.Greeting) {
-      return _i10.Greeting.fromJson(data) as T;
+    if (t == _i10.Exercise) {
+      return _i10.Exercise.fromJson(data) as T;
     }
-    if (t == _i11.PracticeSession) {
-      return _i11.PracticeSession.fromJson(data) as T;
+    if (t == _i11.ExerciseCategory) {
+      return _i11.ExerciseCategory.fromJson(data) as T;
+    }
+    if (t == _i12.ExerciseDifficulty) {
+      return _i12.ExerciseDifficulty.fromJson(data) as T;
+    }
+    if (t == _i13.ExerciseProgress) {
+      return _i13.ExerciseProgress.fromJson(data) as T;
+    }
+    if (t == _i14.Greeting) {
+      return _i14.Greeting.fromJson(data) as T;
+    }
+    if (t == _i15.PracticeSession) {
+      return _i15.PracticeSession.fromJson(data) as T;
     }
     if (t == _i1.getType<_i5.BlockContext?>()) {
       return (data != null ? _i5.BlockContext.fromJson(data) : null) as T;
@@ -321,34 +444,54 @@ class Protocol extends _i1.SerializationManagerServer {
     if (t == _i1.getType<_i8.DifficultWord?>()) {
       return (data != null ? _i8.DifficultWord.fromJson(data) : null) as T;
     }
-    if (t == _i1.getType<_i9.ExerciseProgress?>()) {
-      return (data != null ? _i9.ExerciseProgress.fromJson(data) : null) as T;
+    if (t == _i1.getType<_i9.BreathingPattern?>()) {
+      return (data != null ? _i9.BreathingPattern.fromJson(data) : null) as T;
     }
-    if (t == _i1.getType<_i10.Greeting?>()) {
-      return (data != null ? _i10.Greeting.fromJson(data) : null) as T;
+    if (t == _i1.getType<_i10.Exercise?>()) {
+      return (data != null ? _i10.Exercise.fromJson(data) : null) as T;
     }
-    if (t == _i1.getType<_i11.PracticeSession?>()) {
-      return (data != null ? _i11.PracticeSession.fromJson(data) : null) as T;
+    if (t == _i1.getType<_i11.ExerciseCategory?>()) {
+      return (data != null ? _i11.ExerciseCategory.fromJson(data) : null) as T;
     }
-    if (t == List<_i12.BlockEntry>) {
-      return (data as List).map((e) => deserialize<_i12.BlockEntry>(e)).toList()
+    if (t == _i1.getType<_i12.ExerciseDifficulty?>()) {
+      return (data != null ? _i12.ExerciseDifficulty.fromJson(data) : null)
           as T;
     }
-    if (t == List<_i13.DifficultWord>) {
+    if (t == _i1.getType<_i13.ExerciseProgress?>()) {
+      return (data != null ? _i13.ExerciseProgress.fromJson(data) : null) as T;
+    }
+    if (t == _i1.getType<_i14.Greeting?>()) {
+      return (data != null ? _i14.Greeting.fromJson(data) : null) as T;
+    }
+    if (t == _i1.getType<_i15.PracticeSession?>()) {
+      return (data != null ? _i15.PracticeSession.fromJson(data) : null) as T;
+    }
+    if (t == List<String>) {
+      return (data as List).map((e) => deserialize<String>(e)).toList() as T;
+    }
+    if (t == List<_i16.BlockEntry>) {
+      return (data as List).map((e) => deserialize<_i16.BlockEntry>(e)).toList()
+          as T;
+    }
+    if (t == List<_i17.DifficultWord>) {
       return (data as List)
-              .map((e) => deserialize<_i13.DifficultWord>(e))
+              .map((e) => deserialize<_i17.DifficultWord>(e))
               .toList()
           as T;
     }
-    if (t == List<_i14.ExerciseProgress>) {
+    if (t == List<_i18.Exercise>) {
+      return (data as List).map((e) => deserialize<_i18.Exercise>(e)).toList()
+          as T;
+    }
+    if (t == List<_i19.ExerciseProgress>) {
       return (data as List)
-              .map((e) => deserialize<_i14.ExerciseProgress>(e))
+              .map((e) => deserialize<_i19.ExerciseProgress>(e))
               .toList()
           as T;
     }
-    if (t == List<_i15.PracticeSession>) {
+    if (t == List<_i20.PracticeSession>) {
       return (data as List)
-              .map((e) => deserialize<_i15.PracticeSession>(e))
+              .map((e) => deserialize<_i20.PracticeSession>(e))
               .toList()
           as T;
     }
@@ -370,9 +513,13 @@ class Protocol extends _i1.SerializationManagerServer {
       _i6.BlockEntry => 'BlockEntry',
       _i7.BlockSeverity => 'BlockSeverity',
       _i8.DifficultWord => 'DifficultWord',
-      _i9.ExerciseProgress => 'ExerciseProgress',
-      _i10.Greeting => 'Greeting',
-      _i11.PracticeSession => 'PracticeSession',
+      _i9.BreathingPattern => 'BreathingPattern',
+      _i10.Exercise => 'Exercise',
+      _i11.ExerciseCategory => 'ExerciseCategory',
+      _i12.ExerciseDifficulty => 'ExerciseDifficulty',
+      _i13.ExerciseProgress => 'ExerciseProgress',
+      _i14.Greeting => 'Greeting',
+      _i15.PracticeSession => 'PracticeSession',
       _ => null,
     };
   }
@@ -395,11 +542,19 @@ class Protocol extends _i1.SerializationManagerServer {
         return 'BlockSeverity';
       case _i8.DifficultWord():
         return 'DifficultWord';
-      case _i9.ExerciseProgress():
+      case _i9.BreathingPattern():
+        return 'BreathingPattern';
+      case _i10.Exercise():
+        return 'Exercise';
+      case _i11.ExerciseCategory():
+        return 'ExerciseCategory';
+      case _i12.ExerciseDifficulty():
+        return 'ExerciseDifficulty';
+      case _i13.ExerciseProgress():
         return 'ExerciseProgress';
-      case _i10.Greeting():
+      case _i14.Greeting():
         return 'Greeting';
-      case _i11.PracticeSession():
+      case _i15.PracticeSession():
         return 'PracticeSession';
     }
     className = _i2.Protocol().getClassNameForObject(data);
@@ -435,14 +590,26 @@ class Protocol extends _i1.SerializationManagerServer {
     if (dataClassName == 'DifficultWord') {
       return deserialize<_i8.DifficultWord>(data['data']);
     }
+    if (dataClassName == 'BreathingPattern') {
+      return deserialize<_i9.BreathingPattern>(data['data']);
+    }
+    if (dataClassName == 'Exercise') {
+      return deserialize<_i10.Exercise>(data['data']);
+    }
+    if (dataClassName == 'ExerciseCategory') {
+      return deserialize<_i11.ExerciseCategory>(data['data']);
+    }
+    if (dataClassName == 'ExerciseDifficulty') {
+      return deserialize<_i12.ExerciseDifficulty>(data['data']);
+    }
     if (dataClassName == 'ExerciseProgress') {
-      return deserialize<_i9.ExerciseProgress>(data['data']);
+      return deserialize<_i13.ExerciseProgress>(data['data']);
     }
     if (dataClassName == 'Greeting') {
-      return deserialize<_i10.Greeting>(data['data']);
+      return deserialize<_i14.Greeting>(data['data']);
     }
     if (dataClassName == 'PracticeSession') {
-      return deserialize<_i11.PracticeSession>(data['data']);
+      return deserialize<_i15.PracticeSession>(data['data']);
     }
     if (dataClassName.startsWith('serverpod.')) {
       data['className'] = dataClassName.substring(10);
@@ -484,10 +651,12 @@ class Protocol extends _i1.SerializationManagerServer {
         return _i6.BlockEntry.t;
       case _i8.DifficultWord:
         return _i8.DifficultWord.t;
-      case _i9.ExerciseProgress:
-        return _i9.ExerciseProgress.t;
-      case _i11.PracticeSession:
-        return _i11.PracticeSession.t;
+      case _i10.Exercise:
+        return _i10.Exercise.t;
+      case _i13.ExerciseProgress:
+        return _i13.ExerciseProgress.t;
+      case _i15.PracticeSession:
+        return _i15.PracticeSession.t;
     }
     return null;
   }
