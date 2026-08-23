@@ -1,0 +1,8 @@
+enum: BlockContext
+values:
+  - llamada
+  - publico
+  - desconocidos
+  - conocidos
+  - trabajoEscuela
+  - otro

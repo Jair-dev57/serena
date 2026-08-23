@@ -1,0 +1,10 @@
+class: ExerciseProgress
+table: exercise_progress
+fields:
+  exerciseId: String
+  timesCompleted: int
+  lastCompletedAt: DateTime?
+indexes:
+  exercise_progress_exercise_id_unique:
+    fields: exerciseId
+    unique: true

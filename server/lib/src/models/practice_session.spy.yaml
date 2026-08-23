@@ -1,0 +1,5 @@
+class: PracticeSession
+table: practice_session
+fields:
+  exerciseTitle: String
+  date: DateTime

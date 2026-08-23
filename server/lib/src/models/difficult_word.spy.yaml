@@ -1,0 +1,6 @@
+class: DifficultWord
+table: difficult_word
+fields:
+  word: String
+  dateAdded: DateTime
+  note: String?

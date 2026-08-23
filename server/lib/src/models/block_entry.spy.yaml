@@ -1,0 +1,7 @@
+class: BlockEntry
+table: block_entry
+fields:
+  dateTime: DateTime
+  severity: BlockSeverity
+  context: BlockContext
+  note: String?
