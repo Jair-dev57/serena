@@ -1,4 +1,4 @@
-import 'package:serena_poc_client/serena_poc_client.dart';
+import 'package:serena_client/serena_client.dart';
 
 /// Instancia única del cliente de Serverpod, compartida por toda la app.
 /// Cambiar _serverUrl si cambia la IP de la compu donde corre el backend.

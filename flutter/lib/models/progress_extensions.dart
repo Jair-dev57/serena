@@ -1,4 +1,4 @@
-import 'package:serena_poc_client/serena_poc_client.dart' show ExerciseProgress;
+import 'package:serena_client/serena_client.dart' show ExerciseProgress;
 import '../models/exercise.dart' show ExerciseRank;
 
 extension ExerciseProgressRank on ExerciseProgress {

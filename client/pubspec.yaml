@@ -1,4 +1,4 @@
-name: serena_poc_client
+name: serena_client
 description: Cliente generado de Serverpod para hablarle al backend de Serena.
 
 environment:

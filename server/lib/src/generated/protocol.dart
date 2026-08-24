@@ -27,13 +27,13 @@ import 'exercise/exercise_difficulty.dart' as _i12;
 import 'exercise_progress/exercise_progress.dart' as _i13;
 import 'greetings/greeting.dart' as _i14;
 import 'practice_session/practice_session.dart' as _i15;
-import 'package:serena_poc_server/src/generated/block/block_entry.dart' as _i16;
-import 'package:serena_poc_server/src/generated/difficult_word/difficult_word.dart'
+import 'package:serena_server/src/generated/block/block_entry.dart' as _i16;
+import 'package:serena_server/src/generated/difficult_word/difficult_word.dart'
     as _i17;
-import 'package:serena_poc_server/src/generated/exercise/exercise.dart' as _i18;
-import 'package:serena_poc_server/src/generated/exercise_progress/exercise_progress.dart'
+import 'package:serena_server/src/generated/exercise/exercise.dart' as _i18;
+import 'package:serena_server/src/generated/exercise_progress/exercise_progress.dart'
     as _i19;
-import 'package:serena_poc_server/src/generated/practice_session/practice_session.dart'
+import 'package:serena_server/src/generated/practice_session/practice_session.dart'
     as _i20;
 export 'block/block_context.dart';
 export 'block/block_entry.dart';
@@ -59,7 +59,7 @@ class Protocol extends _i1.SerializationManagerServer {
       name: 'block_entry',
       dartName: 'BlockEntry',
       schema: 'public',
-      module: 'serena_poc',
+      module: 'serena',
       columns: [
         _i2.ColumnDefinition(
           name: 'id',
@@ -115,7 +115,7 @@ class Protocol extends _i1.SerializationManagerServer {
       name: 'difficult_word',
       dartName: 'DifficultWord',
       schema: 'public',
-      module: 'serena_poc',
+      module: 'serena',
       columns: [
         _i2.ColumnDefinition(
           name: 'id',
@@ -165,7 +165,7 @@ class Protocol extends _i1.SerializationManagerServer {
       name: 'exercise',
       dartName: 'Exercise',
       schema: 'public',
-      module: 'serena_poc',
+      module: 'serena',
       columns: [
         _i2.ColumnDefinition(
           name: 'id',
@@ -264,7 +264,7 @@ class Protocol extends _i1.SerializationManagerServer {
       name: 'exercise_progress',
       dartName: 'ExerciseProgress',
       schema: 'public',
-      module: 'serena_poc',
+      module: 'serena',
       columns: [
         _i2.ColumnDefinition(
           name: 'id',
@@ -327,7 +327,7 @@ class Protocol extends _i1.SerializationManagerServer {
       name: 'practice_session',
       dartName: 'PracticeSession',
       schema: 'public',
-      module: 'serena_poc',
+      module: 'serena',
       columns: [
         _i2.ColumnDefinition(
           name: 'id',
@@ -530,7 +530,7 @@ class Protocol extends _i1.SerializationManagerServer {
     if (className != null) return className;
 
     if (data is Map<String, dynamic> && data['__className__'] is String) {
-      return (data['__className__'] as String).replaceFirst('serena_poc.', '');
+      return (data['__className__'] as String).replaceFirst('serena.', '');
     }
 
     switch (data) {
@@ -666,7 +666,7 @@ class Protocol extends _i1.SerializationManagerServer {
       targetTableDefinitions;
 
   @override
-  String getModuleName() => 'serena_poc';
+  String getModuleName() => 'serena';
 
   /// Maps any `Record`s known to this [Protocol] to their JSON representation
   ///

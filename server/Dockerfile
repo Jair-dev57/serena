@@ -1,5 +1,5 @@
 # Build from the project root with:
-# docker build -f serena_poc_server/Dockerfile .
+# docker build -f serena_server/Dockerfile .
 
 # Build stage
 FROM dart:3.8.0 AS build
@@ -7,18 +7,18 @@ FROM dart:3.8.0 AS build
 # Create a minimal workspace that preserves locked server dependency versions.
 WORKDIR /app
 COPY pubspec.lock .
-COPY serena_poc_server serena_poc_server
+COPY serena_server serena_server
 RUN printf '%s\n' \
   'name: _' \
   'environment:' \
   '  sdk: ^3.8.0' \
   'workspace:' \
-  '  - serena_poc_server' \
+  '  - serena_server' \
   > pubspec.yaml
 RUN dart pub get
 
 # Compile the server executable.
-WORKDIR /app/serena_poc_server
+WORKDIR /app/serena_server
 RUN dart compile exe bin/main.dart -o bin/server
 
 # Add a fallback for the copy of possibly missing directories.
@@ -38,15 +38,15 @@ ENV role=monolith
 COPY --from=build /runtime/ /
 
 # Copy compiled server executable
-COPY --from=build /app/serena_poc_server/bin/server server
+COPY --from=build /app/serena_server/bin/server server
 
 # Copy configuration files and resources
-COPY --from=build /app/serena_poc_server/config/ config/
-COPY --from=build /app/serena_poc_server/web/ web/
-COPY --from=build /app/serena_poc_server/migrations/ migrations/
+COPY --from=build /app/serena_server/config/ config/
+COPY --from=build /app/serena_server/web/ web/
+COPY --from=build /app/serena_server/migrations/ migrations/
 
 # This file is required to enable the endpoint log filter in Insights.
-COPY --from=build /app/serena_poc_server/lib/src/generated/protocol.yaml lib/src/generated/protocol.yaml
+COPY --from=build /app/serena_server/lib/src/generated/protocol.yaml lib/src/generated/protocol.yaml
 
 # Expose ports
 EXPOSE 8080

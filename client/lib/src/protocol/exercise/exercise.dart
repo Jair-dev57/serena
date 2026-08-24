@@ -14,7 +14,7 @@ import 'package:serverpod_client/serverpod_client.dart' as _i1;
 import '../exercise/exercise_category.dart' as _i2;
 import '../exercise/exercise_difficulty.dart' as _i3;
 import '../exercise/breathing_pattern.dart' as _i4;
-import 'package:serena_poc_client/src/protocol/protocol.dart' as _i5;
+import 'package:serena_client/src/protocol/protocol.dart' as _i5;
 
 abstract class Exercise implements _i1.SerializableModel {
   Exercise._({

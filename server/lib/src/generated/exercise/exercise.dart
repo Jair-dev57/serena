@@ -14,7 +14,7 @@ import 'package:serverpod/serverpod.dart' as _i1;
 import '../exercise/exercise_category.dart' as _i2;
 import '../exercise/exercise_difficulty.dart' as _i3;
 import '../exercise/breathing_pattern.dart' as _i4;
-import 'package:serena_poc_server/src/generated/protocol.dart' as _i5;
+import 'package:serena_server/src/generated/protocol.dart' as _i5;
 
 abstract class Exercise
     implements _i1.TableRow<int?>, _i1.ProtocolSerialization {

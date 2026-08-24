@@ -19,12 +19,10 @@ import '../endpoints/exercise_endpoint.dart' as _i6;
 import '../endpoints/exercise_progress_endpoint.dart' as _i7;
 import '../endpoints/practice_session_endpoint.dart' as _i8;
 import '../greetings/greeting_endpoint.dart' as _i9;
-import 'package:serena_poc_server/src/generated/block/block_severity.dart'
-    as _i10;
-import 'package:serena_poc_server/src/generated/block/block_context.dart'
-    as _i11;
-import 'package:serena_poc_server/src/generated/block/block_entry.dart' as _i12;
-import 'package:serena_poc_server/src/generated/difficult_word/difficult_word.dart'
+import 'package:serena_server/src/generated/block/block_severity.dart' as _i10;
+import 'package:serena_server/src/generated/block/block_context.dart' as _i11;
+import 'package:serena_server/src/generated/block/block_entry.dart' as _i12;
+import 'package:serena_server/src/generated/difficult_word/difficult_word.dart'
     as _i13;
 import 'package:serverpod_auth_idp_server/serverpod_auth_idp_server.dart'
     as _i14;

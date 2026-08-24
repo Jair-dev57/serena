@@ -16,22 +16,19 @@ import 'package:serverpod/serverpod.dart' as _i2;
 import 'dart:async' as _i3;
 import 'package:serverpod_auth_core_server/serverpod_auth_core_server.dart'
     as _i4;
-import 'package:serena_poc_server/src/generated/block/block_entry.dart' as _i5;
-import 'package:serena_poc_server/src/generated/block/block_severity.dart'
-    as _i6;
-import 'package:serena_poc_server/src/generated/block/block_context.dart'
-    as _i7;
-import 'package:serena_poc_server/src/generated/difficult_word/difficult_word.dart'
+import 'package:serena_server/src/generated/block/block_entry.dart' as _i5;
+import 'package:serena_server/src/generated/block/block_severity.dart' as _i6;
+import 'package:serena_server/src/generated/block/block_context.dart' as _i7;
+import 'package:serena_server/src/generated/difficult_word/difficult_word.dart'
     as _i8;
-import 'package:serena_poc_server/src/generated/exercise/exercise.dart' as _i9;
-import 'package:serena_poc_server/src/generated/exercise_progress/exercise_progress.dart'
+import 'package:serena_server/src/generated/exercise/exercise.dart' as _i9;
+import 'package:serena_server/src/generated/exercise_progress/exercise_progress.dart'
     as _i10;
-import 'package:serena_poc_server/src/generated/practice_session/practice_session.dart'
+import 'package:serena_server/src/generated/practice_session/practice_session.dart'
     as _i11;
-import 'package:serena_poc_server/src/generated/greetings/greeting.dart'
-    as _i12;
-import 'package:serena_poc_server/src/generated/protocol.dart';
-import 'package:serena_poc_server/src/generated/endpoints.dart';
+import 'package:serena_server/src/generated/greetings/greeting.dart' as _i12;
+import 'package:serena_server/src/generated/protocol.dart';
+import 'package:serena_server/src/generated/endpoints.dart';
 export 'package:serverpod_test/serverpod_test_public_exports.dart';
 
 /// Creates a new test group that takes a callback that can be used to write tests.

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:serena_poc_client/serena_poc_client.dart'
+import 'package:serena_client/serena_client.dart'
     show BlockEntry, BlockSeverity, BlockContext;
 import '../data/server_client.dart';
 import 'block_stats_screen.dart';

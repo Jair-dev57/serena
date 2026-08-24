@@ -1,12 +1,12 @@
 {
   "__className__": "serverpod.DatabaseDefinition",
-  "moduleName": "serena_poc",
+  "moduleName": "serena",
   "tables": [
     {
       "__className__": "serverpod.TableDefinition",
       "name": "block_entry",
       "dartName": "BlockEntry",
-      "module": "serena_poc",
+      "module": "serena",
       "schema": "public",
       "columns": [
         {
@@ -69,7 +69,7 @@
       "__className__": "serverpod.TableDefinition",
       "name": "difficult_word",
       "dartName": "DifficultWord",
-      "module": "serena_poc",
+      "module": "serena",
       "schema": "public",
       "columns": [
         {
@@ -125,7 +125,7 @@
       "__className__": "serverpod.TableDefinition",
       "name": "exercise",
       "dartName": "Exercise",
-      "module": "serena_poc",
+      "module": "serena",
       "schema": "public",
       "columns": [
         {
@@ -237,7 +237,7 @@
       "__className__": "serverpod.TableDefinition",
       "name": "exercise_progress",
       "dartName": "ExerciseProgress",
-      "module": "serena_poc",
+      "module": "serena",
       "schema": "public",
       "columns": [
         {
@@ -307,7 +307,7 @@
       "__className__": "serverpod.TableDefinition",
       "name": "practice_session",
       "dartName": "PracticeSession",
-      "module": "serena_poc",
+      "module": "serena",
       "schema": "public",
       "columns": [
         {

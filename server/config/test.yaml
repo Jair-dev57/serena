@@ -32,7 +32,7 @@ webServer:
 database:
   host: localhost
   port: 9090
-  name: serena_poc_test
+  name: serena_test
   user: postgres
   #maxConnectionCount: 10 # Defaults to 10, a negative or null value removes the limit
 

@@ -3,7 +3,7 @@ import '../data/exercises_repository.dart';
 import '../data/server_client.dart';
 import '../data/exercise_path_logic.dart';
 import '../data/weekly_goal_manager.dart';
-import 'package:serena_poc_client/serena_poc_client.dart' show ExerciseProgress;
+import 'package:serena_client/serena_client.dart' show ExerciseProgress;
 import '../models/exercise.dart';
 import '../theme/app_styles.dart';
 import '../widgets/stat_chip.dart';

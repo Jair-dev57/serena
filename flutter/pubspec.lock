@@ -488,7 +488,7 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.7"
-  serena_poc_client:
+  serena_client:
     dependency: "direct main"
     description:
       path: "../client"

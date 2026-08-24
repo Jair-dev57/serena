@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:serena_poc_client/serena_poc_client.dart' show DifficultWord;
+import 'package:serena_client/serena_client.dart' show DifficultWord;
 import '../data/server_client.dart';
 import '../models/exercise.dart' hide DifficultWord;
 import '../data/exercises_repository.dart';

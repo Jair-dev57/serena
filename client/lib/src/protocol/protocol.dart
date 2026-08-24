@@ -22,13 +22,13 @@ import 'exercise/exercise_difficulty.dart' as _i9;
 import 'exercise_progress/exercise_progress.dart' as _i10;
 import 'greetings/greeting.dart' as _i11;
 import 'practice_session/practice_session.dart' as _i12;
-import 'package:serena_poc_client/src/protocol/block/block_entry.dart' as _i13;
-import 'package:serena_poc_client/src/protocol/difficult_word/difficult_word.dart'
+import 'package:serena_client/src/protocol/block/block_entry.dart' as _i13;
+import 'package:serena_client/src/protocol/difficult_word/difficult_word.dart'
     as _i14;
-import 'package:serena_poc_client/src/protocol/exercise/exercise.dart' as _i15;
-import 'package:serena_poc_client/src/protocol/exercise_progress/exercise_progress.dart'
+import 'package:serena_client/src/protocol/exercise/exercise.dart' as _i15;
+import 'package:serena_client/src/protocol/exercise_progress/exercise_progress.dart'
     as _i16;
-import 'package:serena_poc_client/src/protocol/practice_session/practice_session.dart'
+import 'package:serena_client/src/protocol/practice_session/practice_session.dart'
     as _i17;
 import 'package:serverpod_auth_idp_client/serverpod_auth_idp_client.dart'
     as _i18;
@@ -208,7 +208,7 @@ class Protocol extends _i1.SerializationManager {
     if (className != null) return className;
 
     if (data is Map<String, dynamic> && data['__className__'] is String) {
-      return (data['__className__'] as String).replaceFirst('serena_poc.', '');
+      return (data['__className__'] as String).replaceFirst('serena.', '');
     }
 
     switch (data) {

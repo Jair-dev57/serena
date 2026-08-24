@@ -1,5 +1,5 @@
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:serena_poc_client/serena_poc_client.dart' show PracticeSession;
+import 'package:serena_client/serena_client.dart' show PracticeSession;
 
 class WeeklyGoalManager {
   static const String _key = 'weeklyGoalTarget';

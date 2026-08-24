@@ -16,18 +16,17 @@ import 'package:serverpod_client/serverpod_client.dart' as _i2;
 import 'dart:async' as _i3;
 import 'package:serverpod_auth_core_client/serverpod_auth_core_client.dart'
     as _i4;
-import 'package:serena_poc_client/src/protocol/block/block_entry.dart' as _i5;
-import 'package:serena_poc_client/src/protocol/block/block_severity.dart'
-    as _i6;
-import 'package:serena_poc_client/src/protocol/block/block_context.dart' as _i7;
-import 'package:serena_poc_client/src/protocol/difficult_word/difficult_word.dart'
+import 'package:serena_client/src/protocol/block/block_entry.dart' as _i5;
+import 'package:serena_client/src/protocol/block/block_severity.dart' as _i6;
+import 'package:serena_client/src/protocol/block/block_context.dart' as _i7;
+import 'package:serena_client/src/protocol/difficult_word/difficult_word.dart'
     as _i8;
-import 'package:serena_poc_client/src/protocol/exercise/exercise.dart' as _i9;
-import 'package:serena_poc_client/src/protocol/exercise_progress/exercise_progress.dart'
+import 'package:serena_client/src/protocol/exercise/exercise.dart' as _i9;
+import 'package:serena_client/src/protocol/exercise_progress/exercise_progress.dart'
     as _i10;
-import 'package:serena_poc_client/src/protocol/practice_session/practice_session.dart'
+import 'package:serena_client/src/protocol/practice_session/practice_session.dart'
     as _i11;
-import 'package:serena_poc_client/src/protocol/greetings/greeting.dart' as _i12;
+import 'package:serena_client/src/protocol/greetings/greeting.dart' as _i12;
 import 'protocol.dart' as _i13;
 
 /// By extending [EmailIdpBaseEndpoint], the email identity provider endpoints

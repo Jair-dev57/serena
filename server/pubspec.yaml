@@ -1,11 +1,11 @@
-name: serena_poc_server
+name: serena_server
 description: Backend de Serena (Serverpod).
 environment:
   sdk: '^3.8.0'
 dependencies:
   serverpod: 3.4.12
   serverpod_auth_idp_server: 3.4.12
-  serena_poc_client:
+  serena_client:
     path: ../client
 dev_dependencies:
   lints: '>=3.0.0 <7.0.0'

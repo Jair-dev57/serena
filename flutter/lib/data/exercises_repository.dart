@@ -1,4 +1,4 @@
-import 'package:serena_poc_client/serena_poc_client.dart' as server;
+import 'package:serena_client/serena_client.dart' as server;
 import 'server_client.dart';
 import '../models/exercise.dart';
 

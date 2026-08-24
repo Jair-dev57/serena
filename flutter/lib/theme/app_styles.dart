@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:serena_poc_client/serena_poc_client.dart' show BlockSeverity;
+import 'package:serena_client/serena_client.dart' show BlockSeverity;
 import '../models/exercise.dart';
 class AppStyles {
   static const double cardRadius = 16;

@@ -1,4 +1,4 @@
-import 'package:serena_poc_client/serena_poc_client.dart'
+import 'package:serena_client/serena_client.dart'
     show ExerciseProgress, BlockEntry, BlockSeverity;
 import '../models/exercise.dart';
 
