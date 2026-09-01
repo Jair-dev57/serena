@@ -1,0 +1,6 @@
+class: WeeklySummary
+table: weekly_summary
+fields:
+  weekStartDate: DateTime
+  summaryText: String
+  createdAt: DateTime

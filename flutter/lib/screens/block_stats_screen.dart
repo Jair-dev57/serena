@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:serena_client/serena_client.dart'
-    show BlockEntry, BlockSeverity, BlockContext;
+    show BlockEntry, BlockSeverity, BlockContext, WeeklySummary;
 import '../models/block_labels.dart';
 import '../theme/app_styles.dart';
+import '../data/server_client.dart';
 
 class BlockStatsScreen extends StatelessWidget {
   final List<BlockEntry> entries;
@@ -138,6 +139,7 @@ class BlockStatsScreen extends StatelessWidget {
           : ListView(
               padding: AppStyles.screenPadding,
               children: [
+                _WeeklySummaryCard(),
                 Row(
                   children: [
                     Expanded(
@@ -230,6 +232,60 @@ class BlockStatsScreen extends StatelessWidget {
                 ),
               ],
             ),
+    );
+  }
+}
+class _WeeklySummaryCard extends StatelessWidget {
+  const _WeeklySummaryCard();
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<WeeklySummary>(
+      future: ServerClient.instance.weeklySummary.getSummary(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Padding(
+            padding: EdgeInsets.only(bottom: 16),
+            child: Center(child: CircularProgressIndicator()),
+          );
+        }
+        if (snapshot.hasError || !snapshot.hasData) {
+          // Si falla, simplemente no mostramos nada (no rompemos la pantalla).
+          return const SizedBox.shrink();
+        }
+
+        final summary = snapshot.data!;
+        return Padding(
+          padding: const EdgeInsets.only(bottom: 16),
+          child: Card(
+            elevation: 0,
+            color: Theme.of(context).colorScheme.secondaryContainer,
+            shape: AppStyles.cardShape(),
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Tu semana',
+                    style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                          color: Theme.of(context).colorScheme.onSecondaryContainer,
+                          fontWeight: FontWeight.bold,
+                        ),
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    summary.summaryText,
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: Theme.of(context).colorScheme.onSecondaryContainer,
+                        ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 }

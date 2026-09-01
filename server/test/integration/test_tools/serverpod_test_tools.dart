@@ -28,7 +28,9 @@ import 'package:serena_server/src/generated/practice_session/practice_session.da
     as _i11;
 import 'package:serena_server/src/generated/recommendation/recommendation_result.dart'
     as _i12;
-import 'package:serena_server/src/generated/greetings/greeting.dart' as _i13;
+import 'package:serena_server/src/generated/weekly_summary/weekly_summary.dart'
+    as _i13;
+import 'package:serena_server/src/generated/greetings/greeting.dart' as _i14;
 import 'package:serena_server/src/generated/protocol.dart';
 import 'package:serena_server/src/generated/endpoints.dart';
 export 'package:serverpod_test/serverpod_test_public_exports.dart';
@@ -159,6 +161,8 @@ class TestEndpoints {
 
   late final _RecommendationEndpoint recommendation;
 
+  late final _WeeklySummaryEndpoint weeklySummary;
+
   late final _GreetingEndpoint greeting;
 }
 
@@ -198,6 +202,10 @@ class _InternalTestEndpoints extends TestEndpoints
       serializationManager,
     );
     recommendation = _RecommendationEndpoint(
+      endpoints,
+      serializationManager,
+    );
+    weeklySummary = _WeeklySummaryEndpoint(
       endpoints,
       serializationManager,
     );
@@ -1125,6 +1133,47 @@ class _RecommendationEndpoint {
   }
 }
 
+class _WeeklySummaryEndpoint {
+  _WeeklySummaryEndpoint(
+    this._endpointDispatch,
+    this._serializationManager,
+  );
+
+  final _i2.EndpointDispatch _endpointDispatch;
+
+  final _i2.SerializationManager _serializationManager;
+
+  _i3.Future<_i13.WeeklySummary> getSummary(
+    _i1.TestSessionBuilder sessionBuilder,
+  ) async {
+    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'weeklySummary',
+            method: 'getSummary',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'weeklySummary',
+          methodName: 'getSummary',
+          parameters: _i1.testObjectToJson({}),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _i3.Future<_i13.WeeklySummary>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+}
+
 class _GreetingEndpoint {
   _GreetingEndpoint(
     this._endpointDispatch,
@@ -1135,7 +1184,7 @@ class _GreetingEndpoint {
 
   final _i2.SerializationManager _serializationManager;
 
-  _i3.Future<_i13.Greeting> hello(
+  _i3.Future<_i14.Greeting> hello(
     _i1.TestSessionBuilder sessionBuilder,
     String name,
   ) async {
@@ -1158,7 +1207,7 @@ class _GreetingEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _i3.Future<_i13.Greeting>);
+                as _i3.Future<_i14.Greeting>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();

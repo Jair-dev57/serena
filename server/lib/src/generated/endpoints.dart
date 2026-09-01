@@ -19,16 +19,17 @@ import '../endpoints/exercise_endpoint.dart' as _i6;
 import '../endpoints/exercise_progress_endpoint.dart' as _i7;
 import '../endpoints/practice_session_endpoint.dart' as _i8;
 import '../endpoints/recommendation_endpoint.dart' as _i9;
-import '../greetings/greeting_endpoint.dart' as _i10;
-import 'package:serena_server/src/generated/block/block_severity.dart' as _i11;
-import 'package:serena_server/src/generated/block/block_context.dart' as _i12;
-import 'package:serena_server/src/generated/block/block_entry.dart' as _i13;
+import '../endpoints/weekly_summary_endpoint.dart' as _i10;
+import '../greetings/greeting_endpoint.dart' as _i11;
+import 'package:serena_server/src/generated/block/block_severity.dart' as _i12;
+import 'package:serena_server/src/generated/block/block_context.dart' as _i13;
+import 'package:serena_server/src/generated/block/block_entry.dart' as _i14;
 import 'package:serena_server/src/generated/difficult_word/difficult_word.dart'
-    as _i14;
-import 'package:serverpod_auth_idp_server/serverpod_auth_idp_server.dart'
     as _i15;
-import 'package:serverpod_auth_core_server/serverpod_auth_core_server.dart'
+import 'package:serverpod_auth_idp_server/serverpod_auth_idp_server.dart'
     as _i16;
+import 'package:serverpod_auth_core_server/serverpod_auth_core_server.dart'
+    as _i17;
 
 class Endpoints extends _i1.EndpointDispatch {
   @override
@@ -82,7 +83,13 @@ class Endpoints extends _i1.EndpointDispatch {
           'recommendation',
           null,
         ),
-      'greeting': _i10.GreetingEndpoint()
+      'weeklySummary': _i10.WeeklySummaryEndpoint()
+        ..initialize(
+          server,
+          'weeklySummary',
+          null,
+        ),
+      'greeting': _i11.GreetingEndpoint()
         ..initialize(
           server,
           'greeting',
@@ -317,12 +324,12 @@ class Endpoints extends _i1.EndpointDispatch {
             ),
             'severity': _i1.ParameterDescription(
               name: 'severity',
-              type: _i1.getType<_i11.BlockSeverity>(),
+              type: _i1.getType<_i12.BlockSeverity>(),
               nullable: false,
             ),
             'context': _i1.ParameterDescription(
               name: 'context',
-              type: _i1.getType<_i12.BlockContext>(),
+              type: _i1.getType<_i13.BlockContext>(),
               nullable: false,
             ),
             'note': _i1.ParameterDescription(
@@ -349,7 +356,7 @@ class Endpoints extends _i1.EndpointDispatch {
           params: {
             'entry': _i1.ParameterDescription(
               name: 'entry',
-              type: _i1.getType<_i13.BlockEntry>(),
+              type: _i1.getType<_i14.BlockEntry>(),
               nullable: false,
             ),
           },
@@ -430,7 +437,7 @@ class Endpoints extends _i1.EndpointDispatch {
           params: {
             'word': _i1.ParameterDescription(
               name: 'word',
-              type: _i1.getType<_i14.DifficultWord>(),
+              type: _i1.getType<_i15.DifficultWord>(),
               nullable: false,
             ),
           },
@@ -624,6 +631,23 @@ class Endpoints extends _i1.EndpointDispatch {
         ),
       },
     );
+    connectors['weeklySummary'] = _i1.EndpointConnector(
+      name: 'weeklySummary',
+      endpoint: endpoints['weeklySummary']!,
+      methodConnectors: {
+        'getSummary': _i1.MethodConnector(
+          name: 'getSummary',
+          params: {},
+          call:
+              (
+                _i1.Session session,
+                Map<String, dynamic> params,
+              ) async =>
+                  (endpoints['weeklySummary'] as _i10.WeeklySummaryEndpoint)
+                      .getSummary(session),
+        ),
+      },
+    );
     connectors['greeting'] = _i1.EndpointConnector(
       name: 'greeting',
       endpoint: endpoints['greeting']!,
@@ -641,16 +665,16 @@ class Endpoints extends _i1.EndpointDispatch {
               (
                 _i1.Session session,
                 Map<String, dynamic> params,
-              ) async => (endpoints['greeting'] as _i10.GreetingEndpoint).hello(
+              ) async => (endpoints['greeting'] as _i11.GreetingEndpoint).hello(
                 session,
                 params['name'],
               ),
         ),
       },
     );
-    modules['serverpod_auth_idp'] = _i15.Endpoints()
+    modules['serverpod_auth_idp'] = _i16.Endpoints()
       ..initializeEndpoints(server);
-    modules['serverpod_auth_core'] = _i16.Endpoints()
+    modules['serverpod_auth_core'] = _i17.Endpoints()
       ..initializeEndpoints(server);
   }
 }

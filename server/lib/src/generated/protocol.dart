@@ -28,14 +28,15 @@ import 'exercise_progress/exercise_progress.dart' as _i13;
 import 'greetings/greeting.dart' as _i14;
 import 'practice_session/practice_session.dart' as _i15;
 import 'recommendation/recommendation_result.dart' as _i16;
-import 'package:serena_server/src/generated/block/block_entry.dart' as _i17;
+import 'weekly_summary/weekly_summary.dart' as _i17;
+import 'package:serena_server/src/generated/block/block_entry.dart' as _i18;
 import 'package:serena_server/src/generated/difficult_word/difficult_word.dart'
-    as _i18;
-import 'package:serena_server/src/generated/exercise/exercise.dart' as _i19;
+    as _i19;
+import 'package:serena_server/src/generated/exercise/exercise.dart' as _i20;
 import 'package:serena_server/src/generated/exercise_progress/exercise_progress.dart'
-    as _i20;
-import 'package:serena_server/src/generated/practice_session/practice_session.dart'
     as _i21;
+import 'package:serena_server/src/generated/practice_session/practice_session.dart'
+    as _i22;
 export 'block/block_context.dart';
 export 'block/block_entry.dart';
 export 'block/block_severity.dart';
@@ -48,6 +49,7 @@ export 'exercise_progress/exercise_progress.dart';
 export 'greetings/greeting.dart';
 export 'practice_session/practice_session.dart';
 export 'recommendation/recommendation_result.dart';
+export 'weekly_summary/weekly_summary.dart';
 
 class Protocol extends _i1.SerializationManagerServer {
   Protocol._();
@@ -369,6 +371,56 @@ class Protocol extends _i1.SerializationManagerServer {
       ],
       managed: true,
     ),
+    _i2.TableDefinition(
+      name: 'weekly_summary',
+      dartName: 'WeeklySummary',
+      schema: 'public',
+      module: 'serena',
+      columns: [
+        _i2.ColumnDefinition(
+          name: 'id',
+          columnType: _i2.ColumnType.bigint,
+          isNullable: false,
+          dartType: 'int?',
+          columnDefault: 'nextval(\'weekly_summary_id_seq\'::regclass)',
+        ),
+        _i2.ColumnDefinition(
+          name: 'weekStartDate',
+          columnType: _i2.ColumnType.timestampWithoutTimeZone,
+          isNullable: false,
+          dartType: 'DateTime',
+        ),
+        _i2.ColumnDefinition(
+          name: 'summaryText',
+          columnType: _i2.ColumnType.text,
+          isNullable: false,
+          dartType: 'String',
+        ),
+        _i2.ColumnDefinition(
+          name: 'createdAt',
+          columnType: _i2.ColumnType.timestampWithoutTimeZone,
+          isNullable: false,
+          dartType: 'DateTime',
+        ),
+      ],
+      foreignKeys: [],
+      indexes: [
+        _i2.IndexDefinition(
+          indexName: 'weekly_summary_pkey',
+          tableSpace: null,
+          elements: [
+            _i2.IndexElementDefinition(
+              type: _i2.IndexElementDefinitionType.column,
+              definition: 'id',
+            ),
+          ],
+          type: 'btree',
+          isUnique: true,
+          isPrimary: true,
+        ),
+      ],
+      managed: true,
+    ),
     ..._i3.Protocol.targetTableDefinitions,
     ..._i4.Protocol.targetTableDefinitions,
     ..._i2.Protocol.targetTableDefinitions,
@@ -437,6 +489,9 @@ class Protocol extends _i1.SerializationManagerServer {
     if (t == _i16.RecommendationResult) {
       return _i16.RecommendationResult.fromJson(data) as T;
     }
+    if (t == _i17.WeeklySummary) {
+      return _i17.WeeklySummary.fromJson(data) as T;
+    }
     if (t == _i1.getType<_i5.BlockContext?>()) {
       return (data != null ? _i5.BlockContext.fromJson(data) : null) as T;
     }
@@ -475,32 +530,35 @@ class Protocol extends _i1.SerializationManagerServer {
       return (data != null ? _i16.RecommendationResult.fromJson(data) : null)
           as T;
     }
+    if (t == _i1.getType<_i17.WeeklySummary?>()) {
+      return (data != null ? _i17.WeeklySummary.fromJson(data) : null) as T;
+    }
     if (t == List<String>) {
       return (data as List).map((e) => deserialize<String>(e)).toList() as T;
     }
-    if (t == List<_i17.BlockEntry>) {
-      return (data as List).map((e) => deserialize<_i17.BlockEntry>(e)).toList()
+    if (t == List<_i18.BlockEntry>) {
+      return (data as List).map((e) => deserialize<_i18.BlockEntry>(e)).toList()
           as T;
     }
-    if (t == List<_i18.DifficultWord>) {
+    if (t == List<_i19.DifficultWord>) {
       return (data as List)
-              .map((e) => deserialize<_i18.DifficultWord>(e))
+              .map((e) => deserialize<_i19.DifficultWord>(e))
               .toList()
           as T;
     }
-    if (t == List<_i19.Exercise>) {
-      return (data as List).map((e) => deserialize<_i19.Exercise>(e)).toList()
+    if (t == List<_i20.Exercise>) {
+      return (data as List).map((e) => deserialize<_i20.Exercise>(e)).toList()
           as T;
     }
-    if (t == List<_i20.ExerciseProgress>) {
+    if (t == List<_i21.ExerciseProgress>) {
       return (data as List)
-              .map((e) => deserialize<_i20.ExerciseProgress>(e))
+              .map((e) => deserialize<_i21.ExerciseProgress>(e))
               .toList()
           as T;
     }
-    if (t == List<_i21.PracticeSession>) {
+    if (t == List<_i22.PracticeSession>) {
       return (data as List)
-              .map((e) => deserialize<_i21.PracticeSession>(e))
+              .map((e) => deserialize<_i22.PracticeSession>(e))
               .toList()
           as T;
     }
@@ -530,6 +588,7 @@ class Protocol extends _i1.SerializationManagerServer {
       _i14.Greeting => 'Greeting',
       _i15.PracticeSession => 'PracticeSession',
       _i16.RecommendationResult => 'RecommendationResult',
+      _i17.WeeklySummary => 'WeeklySummary',
       _ => null,
     };
   }
@@ -568,6 +627,8 @@ class Protocol extends _i1.SerializationManagerServer {
         return 'PracticeSession';
       case _i16.RecommendationResult():
         return 'RecommendationResult';
+      case _i17.WeeklySummary():
+        return 'WeeklySummary';
     }
     className = _i2.Protocol().getClassNameForObject(data);
     if (className != null) {
@@ -626,6 +687,9 @@ class Protocol extends _i1.SerializationManagerServer {
     if (dataClassName == 'RecommendationResult') {
       return deserialize<_i16.RecommendationResult>(data['data']);
     }
+    if (dataClassName == 'WeeklySummary') {
+      return deserialize<_i17.WeeklySummary>(data['data']);
+    }
     if (dataClassName.startsWith('serverpod.')) {
       data['className'] = dataClassName.substring(10);
       return _i2.Protocol().deserializeByClassName(data);
@@ -672,6 +736,8 @@ class Protocol extends _i1.SerializationManagerServer {
         return _i13.ExerciseProgress.t;
       case _i15.PracticeSession:
         return _i15.PracticeSession.t;
+      case _i17.WeeklySummary:
+        return _i17.WeeklySummary.t;
     }
     return null;
   }

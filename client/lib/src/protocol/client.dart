@@ -28,8 +28,10 @@ import 'package:serena_client/src/protocol/practice_session/practice_session.dar
     as _i11;
 import 'package:serena_client/src/protocol/recommendation/recommendation_result.dart'
     as _i12;
-import 'package:serena_client/src/protocol/greetings/greeting.dart' as _i13;
-import 'protocol.dart' as _i14;
+import 'package:serena_client/src/protocol/weekly_summary/weekly_summary.dart'
+    as _i13;
+import 'package:serena_client/src/protocol/greetings/greeting.dart' as _i14;
+import 'protocol.dart' as _i15;
 
 /// By extending [EmailIdpBaseEndpoint], the email identity provider endpoints
 /// are made available on the server and enable the corresponding sign-in widget
@@ -439,6 +441,23 @@ class EndpointRecommendation extends _i2.EndpointRef {
       );
 }
 
+/// {@category Endpoint}
+class EndpointWeeklySummary extends _i2.EndpointRef {
+  EndpointWeeklySummary(_i2.EndpointCaller caller) : super(caller);
+
+  @override
+  String get name => 'weeklySummary';
+
+  /// Devuelve el resumen de la semana actual (lunes a lunes). Si todavía
+  /// no existe uno para esta semana, lo genera con Claude y lo guarda.
+  _i3.Future<_i13.WeeklySummary> getSummary() =>
+      caller.callServerEndpoint<_i13.WeeklySummary>(
+        'weeklySummary',
+        'getSummary',
+        {},
+      );
+}
+
 /// This is an example endpoint that returns a greeting message through
 /// its [hello] method.
 /// {@category Endpoint}
@@ -449,8 +468,8 @@ class EndpointGreeting extends _i2.EndpointRef {
   String get name => 'greeting';
 
   /// Returns a personalized greeting message: "Hello {name}".
-  _i3.Future<_i13.Greeting> hello(String name) =>
-      caller.callServerEndpoint<_i13.Greeting>(
+  _i3.Future<_i14.Greeting> hello(String name) =>
+      caller.callServerEndpoint<_i14.Greeting>(
         'greeting',
         'hello',
         {'name': name},
@@ -488,7 +507,7 @@ class Client extends _i2.ServerpodClientShared {
     bool? disconnectStreamsOnLostInternetConnection,
   }) : super(
          host,
-         _i14.Protocol(),
+         _i15.Protocol(),
          securityContext: securityContext,
          streamingConnectionTimeout: streamingConnectionTimeout,
          connectionTimeout: connectionTimeout,
@@ -505,6 +524,7 @@ class Client extends _i2.ServerpodClientShared {
     exerciseProgress = EndpointExerciseProgress(this);
     practiceSession = EndpointPracticeSession(this);
     recommendation = EndpointRecommendation(this);
+    weeklySummary = EndpointWeeklySummary(this);
     greeting = EndpointGreeting(this);
     modules = Modules(this);
   }
@@ -525,6 +545,8 @@ class Client extends _i2.ServerpodClientShared {
 
   late final EndpointRecommendation recommendation;
 
+  late final EndpointWeeklySummary weeklySummary;
+
   late final EndpointGreeting greeting;
 
   late final Modules modules;
@@ -539,6 +561,7 @@ class Client extends _i2.ServerpodClientShared {
     'exerciseProgress': exerciseProgress,
     'practiceSession': practiceSession,
     'recommendation': recommendation,
+    'weeklySummary': weeklySummary,
     'greeting': greeting,
   };
 
