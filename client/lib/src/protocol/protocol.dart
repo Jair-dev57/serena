@@ -22,18 +22,19 @@ import 'exercise/exercise_difficulty.dart' as _i9;
 import 'exercise_progress/exercise_progress.dart' as _i10;
 import 'greetings/greeting.dart' as _i11;
 import 'practice_session/practice_session.dart' as _i12;
-import 'package:serena_client/src/protocol/block/block_entry.dart' as _i13;
+import 'recommendation/recommendation_result.dart' as _i13;
+import 'package:serena_client/src/protocol/block/block_entry.dart' as _i14;
 import 'package:serena_client/src/protocol/difficult_word/difficult_word.dart'
-    as _i14;
-import 'package:serena_client/src/protocol/exercise/exercise.dart' as _i15;
+    as _i15;
+import 'package:serena_client/src/protocol/exercise/exercise.dart' as _i16;
 import 'package:serena_client/src/protocol/exercise_progress/exercise_progress.dart'
-    as _i16;
-import 'package:serena_client/src/protocol/practice_session/practice_session.dart'
     as _i17;
-import 'package:serverpod_auth_idp_client/serverpod_auth_idp_client.dart'
+import 'package:serena_client/src/protocol/practice_session/practice_session.dart'
     as _i18;
-import 'package:serverpod_auth_core_client/serverpod_auth_core_client.dart'
+import 'package:serverpod_auth_idp_client/serverpod_auth_idp_client.dart'
     as _i19;
+import 'package:serverpod_auth_core_client/serverpod_auth_core_client.dart'
+    as _i20;
 export 'block/block_context.dart';
 export 'block/block_entry.dart';
 export 'block/block_severity.dart';
@@ -45,6 +46,7 @@ export 'exercise/exercise_difficulty.dart';
 export 'exercise_progress/exercise_progress.dart';
 export 'greetings/greeting.dart';
 export 'practice_session/practice_session.dart';
+export 'recommendation/recommendation_result.dart';
 export 'client.dart';
 
 class Protocol extends _i1.SerializationManager {
@@ -114,6 +116,9 @@ class Protocol extends _i1.SerializationManager {
     if (t == _i12.PracticeSession) {
       return _i12.PracticeSession.fromJson(data) as T;
     }
+    if (t == _i13.RecommendationResult) {
+      return _i13.RecommendationResult.fromJson(data) as T;
+    }
     if (t == _i1.getType<_i2.BlockContext?>()) {
       return (data != null ? _i2.BlockContext.fromJson(data) : null) as T;
     }
@@ -147,40 +152,44 @@ class Protocol extends _i1.SerializationManager {
     if (t == _i1.getType<_i12.PracticeSession?>()) {
       return (data != null ? _i12.PracticeSession.fromJson(data) : null) as T;
     }
+    if (t == _i1.getType<_i13.RecommendationResult?>()) {
+      return (data != null ? _i13.RecommendationResult.fromJson(data) : null)
+          as T;
+    }
     if (t == List<String>) {
       return (data as List).map((e) => deserialize<String>(e)).toList() as T;
     }
-    if (t == List<_i13.BlockEntry>) {
-      return (data as List).map((e) => deserialize<_i13.BlockEntry>(e)).toList()
+    if (t == List<_i14.BlockEntry>) {
+      return (data as List).map((e) => deserialize<_i14.BlockEntry>(e)).toList()
           as T;
     }
-    if (t == List<_i14.DifficultWord>) {
+    if (t == List<_i15.DifficultWord>) {
       return (data as List)
-              .map((e) => deserialize<_i14.DifficultWord>(e))
+              .map((e) => deserialize<_i15.DifficultWord>(e))
               .toList()
           as T;
     }
-    if (t == List<_i15.Exercise>) {
-      return (data as List).map((e) => deserialize<_i15.Exercise>(e)).toList()
+    if (t == List<_i16.Exercise>) {
+      return (data as List).map((e) => deserialize<_i16.Exercise>(e)).toList()
           as T;
     }
-    if (t == List<_i16.ExerciseProgress>) {
+    if (t == List<_i17.ExerciseProgress>) {
       return (data as List)
-              .map((e) => deserialize<_i16.ExerciseProgress>(e))
+              .map((e) => deserialize<_i17.ExerciseProgress>(e))
               .toList()
           as T;
     }
-    if (t == List<_i17.PracticeSession>) {
+    if (t == List<_i18.PracticeSession>) {
       return (data as List)
-              .map((e) => deserialize<_i17.PracticeSession>(e))
+              .map((e) => deserialize<_i18.PracticeSession>(e))
               .toList()
           as T;
     }
-    try {
-      return _i18.Protocol().deserialize<T>(data, t);
-    } on _i1.DeserializationTypeNotFoundException catch (_) {}
     try {
       return _i19.Protocol().deserialize<T>(data, t);
+    } on _i1.DeserializationTypeNotFoundException catch (_) {}
+    try {
+      return _i20.Protocol().deserialize<T>(data, t);
     } on _i1.DeserializationTypeNotFoundException catch (_) {}
     return super.deserialize<T>(data, t);
   }
@@ -198,6 +207,7 @@ class Protocol extends _i1.SerializationManager {
       _i10.ExerciseProgress => 'ExerciseProgress',
       _i11.Greeting => 'Greeting',
       _i12.PracticeSession => 'PracticeSession',
+      _i13.RecommendationResult => 'RecommendationResult',
       _ => null,
     };
   }
@@ -234,12 +244,14 @@ class Protocol extends _i1.SerializationManager {
         return 'Greeting';
       case _i12.PracticeSession():
         return 'PracticeSession';
+      case _i13.RecommendationResult():
+        return 'RecommendationResult';
     }
-    className = _i18.Protocol().getClassNameForObject(data);
+    className = _i19.Protocol().getClassNameForObject(data);
     if (className != null) {
       return 'serverpod_auth_idp.$className';
     }
-    className = _i19.Protocol().getClassNameForObject(data);
+    className = _i20.Protocol().getClassNameForObject(data);
     if (className != null) {
       return 'serverpod_auth_core.$className';
     }
@@ -285,13 +297,16 @@ class Protocol extends _i1.SerializationManager {
     if (dataClassName == 'PracticeSession') {
       return deserialize<_i12.PracticeSession>(data['data']);
     }
+    if (dataClassName == 'RecommendationResult') {
+      return deserialize<_i13.RecommendationResult>(data['data']);
+    }
     if (dataClassName.startsWith('serverpod_auth_idp.')) {
       data['className'] = dataClassName.substring(19);
-      return _i18.Protocol().deserializeByClassName(data);
+      return _i19.Protocol().deserializeByClassName(data);
     }
     if (dataClassName.startsWith('serverpod_auth_core.')) {
       data['className'] = dataClassName.substring(20);
-      return _i19.Protocol().deserializeByClassName(data);
+      return _i20.Protocol().deserializeByClassName(data);
     }
     return super.deserializeByClassName(data);
   }
@@ -306,10 +321,10 @@ class Protocol extends _i1.SerializationManager {
       return null;
     }
     try {
-      return _i18.Protocol().mapRecordToJson(record);
+      return _i19.Protocol().mapRecordToJson(record);
     } catch (_) {}
     try {
-      return _i19.Protocol().mapRecordToJson(record);
+      return _i20.Protocol().mapRecordToJson(record);
     } catch (_) {}
     throw Exception('Unsupported record type ${record.runtimeType}');
   }

@@ -26,8 +26,10 @@ import 'package:serena_client/src/protocol/exercise_progress/exercise_progress.d
     as _i10;
 import 'package:serena_client/src/protocol/practice_session/practice_session.dart'
     as _i11;
-import 'package:serena_client/src/protocol/greetings/greeting.dart' as _i12;
-import 'protocol.dart' as _i13;
+import 'package:serena_client/src/protocol/recommendation/recommendation_result.dart'
+    as _i12;
+import 'package:serena_client/src/protocol/greetings/greeting.dart' as _i13;
+import 'protocol.dart' as _i14;
 
 /// By extending [EmailIdpBaseEndpoint], the email identity provider endpoints
 /// are made available on the server and enable the corresponding sign-in widget
@@ -420,6 +422,23 @@ class EndpointPracticeSession extends _i2.EndpointRef {
   );
 }
 
+/// {@category Endpoint}
+class EndpointRecommendation extends _i2.EndpointRef {
+  EndpointRecommendation(_i2.EndpointCaller caller) : super(caller);
+
+  @override
+  String get name => 'recommendation';
+
+  /// Devuelve una recomendación de práctica (mensaje + ejercicio puntual) si
+  /// hubo bloqueos en la última semana, o `null` si no hace falta recomendar nada.
+  _i3.Future<_i12.RecommendationResult?> getRecommendation() =>
+      caller.callServerEndpoint<_i12.RecommendationResult?>(
+        'recommendation',
+        'getRecommendation',
+        {},
+      );
+}
+
 /// This is an example endpoint that returns a greeting message through
 /// its [hello] method.
 /// {@category Endpoint}
@@ -430,8 +449,8 @@ class EndpointGreeting extends _i2.EndpointRef {
   String get name => 'greeting';
 
   /// Returns a personalized greeting message: "Hello {name}".
-  _i3.Future<_i12.Greeting> hello(String name) =>
-      caller.callServerEndpoint<_i12.Greeting>(
+  _i3.Future<_i13.Greeting> hello(String name) =>
+      caller.callServerEndpoint<_i13.Greeting>(
         'greeting',
         'hello',
         {'name': name},
@@ -469,7 +488,7 @@ class Client extends _i2.ServerpodClientShared {
     bool? disconnectStreamsOnLostInternetConnection,
   }) : super(
          host,
-         _i13.Protocol(),
+         _i14.Protocol(),
          securityContext: securityContext,
          streamingConnectionTimeout: streamingConnectionTimeout,
          connectionTimeout: connectionTimeout,
@@ -485,6 +504,7 @@ class Client extends _i2.ServerpodClientShared {
     exercise = EndpointExercise(this);
     exerciseProgress = EndpointExerciseProgress(this);
     practiceSession = EndpointPracticeSession(this);
+    recommendation = EndpointRecommendation(this);
     greeting = EndpointGreeting(this);
     modules = Modules(this);
   }
@@ -503,6 +523,8 @@ class Client extends _i2.ServerpodClientShared {
 
   late final EndpointPracticeSession practiceSession;
 
+  late final EndpointRecommendation recommendation;
+
   late final EndpointGreeting greeting;
 
   late final Modules modules;
@@ -516,6 +538,7 @@ class Client extends _i2.ServerpodClientShared {
     'exercise': exercise,
     'exerciseProgress': exerciseProgress,
     'practiceSession': practiceSession,
+    'recommendation': recommendation,
     'greeting': greeting,
   };
 

@@ -27,14 +27,15 @@ import 'exercise/exercise_difficulty.dart' as _i12;
 import 'exercise_progress/exercise_progress.dart' as _i13;
 import 'greetings/greeting.dart' as _i14;
 import 'practice_session/practice_session.dart' as _i15;
-import 'package:serena_server/src/generated/block/block_entry.dart' as _i16;
+import 'recommendation/recommendation_result.dart' as _i16;
+import 'package:serena_server/src/generated/block/block_entry.dart' as _i17;
 import 'package:serena_server/src/generated/difficult_word/difficult_word.dart'
-    as _i17;
-import 'package:serena_server/src/generated/exercise/exercise.dart' as _i18;
+    as _i18;
+import 'package:serena_server/src/generated/exercise/exercise.dart' as _i19;
 import 'package:serena_server/src/generated/exercise_progress/exercise_progress.dart'
-    as _i19;
-import 'package:serena_server/src/generated/practice_session/practice_session.dart'
     as _i20;
+import 'package:serena_server/src/generated/practice_session/practice_session.dart'
+    as _i21;
 export 'block/block_context.dart';
 export 'block/block_entry.dart';
 export 'block/block_severity.dart';
@@ -46,6 +47,7 @@ export 'exercise/exercise_difficulty.dart';
 export 'exercise_progress/exercise_progress.dart';
 export 'greetings/greeting.dart';
 export 'practice_session/practice_session.dart';
+export 'recommendation/recommendation_result.dart';
 
 class Protocol extends _i1.SerializationManagerServer {
   Protocol._();
@@ -432,6 +434,9 @@ class Protocol extends _i1.SerializationManagerServer {
     if (t == _i15.PracticeSession) {
       return _i15.PracticeSession.fromJson(data) as T;
     }
+    if (t == _i16.RecommendationResult) {
+      return _i16.RecommendationResult.fromJson(data) as T;
+    }
     if (t == _i1.getType<_i5.BlockContext?>()) {
       return (data != null ? _i5.BlockContext.fromJson(data) : null) as T;
     }
@@ -466,32 +471,36 @@ class Protocol extends _i1.SerializationManagerServer {
     if (t == _i1.getType<_i15.PracticeSession?>()) {
       return (data != null ? _i15.PracticeSession.fromJson(data) : null) as T;
     }
+    if (t == _i1.getType<_i16.RecommendationResult?>()) {
+      return (data != null ? _i16.RecommendationResult.fromJson(data) : null)
+          as T;
+    }
     if (t == List<String>) {
       return (data as List).map((e) => deserialize<String>(e)).toList() as T;
     }
-    if (t == List<_i16.BlockEntry>) {
-      return (data as List).map((e) => deserialize<_i16.BlockEntry>(e)).toList()
+    if (t == List<_i17.BlockEntry>) {
+      return (data as List).map((e) => deserialize<_i17.BlockEntry>(e)).toList()
           as T;
     }
-    if (t == List<_i17.DifficultWord>) {
+    if (t == List<_i18.DifficultWord>) {
       return (data as List)
-              .map((e) => deserialize<_i17.DifficultWord>(e))
+              .map((e) => deserialize<_i18.DifficultWord>(e))
               .toList()
           as T;
     }
-    if (t == List<_i18.Exercise>) {
-      return (data as List).map((e) => deserialize<_i18.Exercise>(e)).toList()
+    if (t == List<_i19.Exercise>) {
+      return (data as List).map((e) => deserialize<_i19.Exercise>(e)).toList()
           as T;
     }
-    if (t == List<_i19.ExerciseProgress>) {
+    if (t == List<_i20.ExerciseProgress>) {
       return (data as List)
-              .map((e) => deserialize<_i19.ExerciseProgress>(e))
+              .map((e) => deserialize<_i20.ExerciseProgress>(e))
               .toList()
           as T;
     }
-    if (t == List<_i20.PracticeSession>) {
+    if (t == List<_i21.PracticeSession>) {
       return (data as List)
-              .map((e) => deserialize<_i20.PracticeSession>(e))
+              .map((e) => deserialize<_i21.PracticeSession>(e))
               .toList()
           as T;
     }
@@ -520,6 +529,7 @@ class Protocol extends _i1.SerializationManagerServer {
       _i13.ExerciseProgress => 'ExerciseProgress',
       _i14.Greeting => 'Greeting',
       _i15.PracticeSession => 'PracticeSession',
+      _i16.RecommendationResult => 'RecommendationResult',
       _ => null,
     };
   }
@@ -556,6 +566,8 @@ class Protocol extends _i1.SerializationManagerServer {
         return 'Greeting';
       case _i15.PracticeSession():
         return 'PracticeSession';
+      case _i16.RecommendationResult():
+        return 'RecommendationResult';
     }
     className = _i2.Protocol().getClassNameForObject(data);
     if (className != null) {
@@ -610,6 +622,9 @@ class Protocol extends _i1.SerializationManagerServer {
     }
     if (dataClassName == 'PracticeSession') {
       return deserialize<_i15.PracticeSession>(data['data']);
+    }
+    if (dataClassName == 'RecommendationResult') {
+      return deserialize<_i16.RecommendationResult>(data['data']);
     }
     if (dataClassName.startsWith('serverpod.')) {
       data['className'] = dataClassName.substring(10);

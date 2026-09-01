@@ -26,7 +26,9 @@ import 'package:serena_server/src/generated/exercise_progress/exercise_progress.
     as _i10;
 import 'package:serena_server/src/generated/practice_session/practice_session.dart'
     as _i11;
-import 'package:serena_server/src/generated/greetings/greeting.dart' as _i12;
+import 'package:serena_server/src/generated/recommendation/recommendation_result.dart'
+    as _i12;
+import 'package:serena_server/src/generated/greetings/greeting.dart' as _i13;
 import 'package:serena_server/src/generated/protocol.dart';
 import 'package:serena_server/src/generated/endpoints.dart';
 export 'package:serverpod_test/serverpod_test_public_exports.dart';
@@ -155,6 +157,8 @@ class TestEndpoints {
 
   late final _PracticeSessionEndpoint practiceSession;
 
+  late final _RecommendationEndpoint recommendation;
+
   late final _GreetingEndpoint greeting;
 }
 
@@ -190,6 +194,10 @@ class _InternalTestEndpoints extends TestEndpoints
       serializationManager,
     );
     practiceSession = _PracticeSessionEndpoint(
+      endpoints,
+      serializationManager,
+    );
+    recommendation = _RecommendationEndpoint(
       endpoints,
       serializationManager,
     );
@@ -1076,6 +1084,47 @@ class _PracticeSessionEndpoint {
   }
 }
 
+class _RecommendationEndpoint {
+  _RecommendationEndpoint(
+    this._endpointDispatch,
+    this._serializationManager,
+  );
+
+  final _i2.EndpointDispatch _endpointDispatch;
+
+  final _i2.SerializationManager _serializationManager;
+
+  _i3.Future<_i12.RecommendationResult?> getRecommendation(
+    _i1.TestSessionBuilder sessionBuilder,
+  ) async {
+    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'recommendation',
+            method: 'getRecommendation',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'recommendation',
+          methodName: 'getRecommendation',
+          parameters: _i1.testObjectToJson({}),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _i3.Future<_i12.RecommendationResult?>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+}
+
 class _GreetingEndpoint {
   _GreetingEndpoint(
     this._endpointDispatch,
@@ -1086,7 +1135,7 @@ class _GreetingEndpoint {
 
   final _i2.SerializationManager _serializationManager;
 
-  _i3.Future<_i12.Greeting> hello(
+  _i3.Future<_i13.Greeting> hello(
     _i1.TestSessionBuilder sessionBuilder,
     String name,
   ) async {
@@ -1109,7 +1158,7 @@ class _GreetingEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _i3.Future<_i12.Greeting>);
+                as _i3.Future<_i13.Greeting>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();

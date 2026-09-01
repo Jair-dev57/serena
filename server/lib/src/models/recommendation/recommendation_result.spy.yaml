@@ -1,0 +1,4 @@
+class: RecommendationResult
+fields:
+  message: String
+  exerciseKey: String

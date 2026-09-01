@@ -3,7 +3,7 @@ import '../data/exercises_repository.dart';
 import '../data/server_client.dart';
 import '../data/exercise_path_logic.dart';
 import '../data/weekly_goal_manager.dart';
-import 'package:serena_client/serena_client.dart' show ExerciseProgress;
+import 'package:serena_client/serena_client.dart' show ExerciseProgress, RecommendationResult;
 import '../models/exercise.dart';
 import '../theme/app_styles.dart';
 import '../widgets/stat_chip.dart';
@@ -29,6 +29,8 @@ class _RouteScreenState extends State<RouteScreen> {
   bool _loading = true;
   int _streak = 0;
   bool _hasRecentStrongBlock = false;
+  RecommendationResult? _recommendation;
+  bool _dismissRecommendation = false;
   int _weeklyTarget = WeeklyGoalManager.defaultTarget;
   int _sessionsThisWeek = 0;
 
@@ -52,11 +54,20 @@ class _RouteScreenState extends State<RouteScreen> {
     final blockEntries = await ServerClient.instance.blockEntry.getAllEntries();
     final sessions = await ServerClient.instance.practiceSession.getAllSessions();
     final weeklyTarget = await WeeklyGoalManager.getTarget();
+    final hasRecentStrongBlock = ExercisePathLogic.hasRecentStrongBlock(blockEntries);
+
+    RecommendationResult? recommendation;
+    if (hasRecentStrongBlock) {
+      recommendation =
+          await ServerClient.instance.recommendation.getRecommendation();
+    }
+
     setState(() {
       _exercises = exercises;
       _progressById = {for (final p in allProgress) p.exerciseId: p};
       _streak = streak;
-      _hasRecentStrongBlock = ExercisePathLogic.hasRecentStrongBlock(blockEntries);
+      _hasRecentStrongBlock = hasRecentStrongBlock;
+      _recommendation = recommendation;
       _weeklyTarget = weeklyTarget;
       _sessionsThisWeek = WeeklyGoalManager.sessionsThisWeek(sessions);
       _loading = false;
@@ -90,16 +101,17 @@ class _RouteScreenState extends State<RouteScreen> {
     }
   }
 
-  void _practiceRespiracion() {
-    final respiracionExercises = ExercisePathLogic.exercisesForCategory(
-      _exercises,
-      ExerciseCategory.respiracion,
-    );
-    final recommended = respiracionExercises.firstWhere(
-      (e) => ExercisePathLogic.isUnlocked(e, respiracionExercises, _progressById),
-      orElse: () => respiracionExercises.first,
-    );
-    _openExercise(recommended);
+  void _practiceRecommended() {
+    setState(() {
+      _dismissRecommendation = true;
+    });
+    final key = _recommendation?.exerciseKey;
+    if (key == null) return;
+
+    final exercise = _exercises.where((e) => e.id == key).firstOrNull;
+    if (exercise == null) return;
+
+    _openExercise(exercise);
   }
 
   void _showStreakInfo() {
@@ -403,7 +415,7 @@ class _RouteScreenState extends State<RouteScreen> {
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          if (_hasRecentStrongBlock)
+          if (_hasRecentStrongBlock && !_dismissRecommendation)
             Padding(
               padding: const EdgeInsets.only(bottom: 16),
               child: Card(
@@ -435,7 +447,8 @@ class _RouteScreenState extends State<RouteScreen> {
                       ),
                       const SizedBox(height: 6),
                       Text(
-                        'Un ejercicio de respiración puede ayudarte a regularte antes de hablar.',
+                        _recommendation?.message ??
+                            'Un ejercicio de respiración puede ayudarte a regularte antes de hablar.',
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
                               color: Theme.of(context).colorScheme.onErrorContainer,
                             ),
@@ -444,8 +457,10 @@ class _RouteScreenState extends State<RouteScreen> {
                       SizedBox(
                         width: double.infinity,
                         child: FilledButton.tonal(
-                          onPressed: _practiceRespiracion,
-                          child: const Text('Practicar respiración'),
+                          onPressed: _practiceRecommended,
+                          child: Text(
+                            'Practicar: ${_exercises.where((e) => e.id == _recommendation?.exerciseKey).firstOrNull?.title ?? 'ejercicio recomendado'}',
+                          ),
                         ),
                       ),
                     ],
