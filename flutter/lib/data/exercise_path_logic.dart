@@ -12,16 +12,14 @@ class ExercisePathLogic {
     return list;
   }
 
+  /// Todos los ejercicios están disponibles: el usuario puede practicar
+  /// cualquiera, sin importar su progreso previo (a pedido explícito).
   static bool isUnlocked(
     Exercise exercise,
     List<Exercise> categoryExercises,
     Map<String, ExerciseProgress> progressById,
   ) {
-    final index = categoryExercises.indexWhere((e) => e.id == exercise.id);
-    if (index == 0) return true;
-    final previous = categoryExercises[index - 1];
-    final previousProgress = progressById[previous.id];
-    return previousProgress != null && previousProgress.timesCompleted >= 1;
+    return true;
   }
 
   static bool isCategoryCompleted(
@@ -34,17 +32,15 @@ class ExercisePathLogic {
     });
   }
 
+  /// Todas las categorías están disponibles, sin restricción de orden
+  /// (a pedido explícito).
   static bool isCategoryUnlocked(
     ExerciseCategory category,
     List<ExerciseCategory> orderedCategories,
     Map<ExerciseCategory, List<Exercise>> exercisesByCategory,
     Map<String, ExerciseProgress> progressById,
   ) {
-    final index = orderedCategories.indexOf(category);
-    if (index == 0) return true;
-    final previousCategory = orderedCategories[index - 1];
-    final previousExercises = exercisesByCategory[previousCategory] ?? [];
-    return isCategoryCompleted(previousExercises, progressById);
+    return true;
   }
 
   static Exercise? nextRecommendedExercise(
