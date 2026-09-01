@@ -58,8 +58,14 @@ class _RouteScreenState extends State<RouteScreen> {
 
     RecommendationResult? recommendation;
     if (hasRecentStrongBlock) {
-      recommendation =
-          await ServerClient.instance.recommendation.getRecommendation();
+      try {
+        recommendation =
+            await ServerClient.instance.recommendation.getRecommendation();
+      } catch (_) {
+        // Si falla (sin internet, Anthropic caído, etc.) seguimos sin
+        // recomendación, sin romper el resto de la pantalla.
+        recommendation = null;
+      }
     }
 
     setState(() {

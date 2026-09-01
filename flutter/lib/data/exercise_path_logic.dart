@@ -12,14 +12,18 @@ class ExercisePathLogic {
     return list;
   }
 
-  /// Todos los ejercicios están disponibles: el usuario puede practicar
-  /// cualquiera, sin importar su progreso previo (a pedido explícito).
+  /// Dentro de una categoría, cada ejercicio se desbloquea al completar
+  /// el anterior al menos una vez (progresión dentro de la sección).
   static bool isUnlocked(
     Exercise exercise,
     List<Exercise> categoryExercises,
     Map<String, ExerciseProgress> progressById,
   ) {
-    return true;
+    final index = categoryExercises.indexWhere((e) => e.id == exercise.id);
+    if (index == 0) return true;
+    final previous = categoryExercises[index - 1];
+    final previousProgress = progressById[previous.id];
+    return previousProgress != null && previousProgress.timesCompleted >= 1;
   }
 
   static bool isCategoryCompleted(
