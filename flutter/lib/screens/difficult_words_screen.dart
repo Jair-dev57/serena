@@ -127,7 +127,7 @@ class _DifficultWordsScreenState extends State<DifficultWordsScreen> {
                   await ServerClient.instance.difficultWord.updateWord(updated);
                   _loadWords();
                 }
-                if (mounted) Navigator.pop(dialogContext);
+                if (dialogContext.mounted) Navigator.pop(dialogContext);
               },
               child: const Text('Guardar'),
             ),

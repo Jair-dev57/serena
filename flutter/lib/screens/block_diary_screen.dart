@@ -151,7 +151,9 @@ class _BlockDiaryScreenState extends State<BlockDiaryScreen> {
                           );
                           await ServerClient.instance.blockEntry.updateEntry(updated);
                           _loadEntries();
-                          Navigator.pop(bottomSheetContext);
+                          if (bottomSheetContext.mounted) {
+                            Navigator.pop(bottomSheetContext);
+                          }
                         },
                         child: const Text('Guardar cambios'),
                       ),

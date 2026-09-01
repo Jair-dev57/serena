@@ -26,7 +26,7 @@ class _GuidedExerciseScreenState extends State<GuidedExerciseScreen>
 
   int _completedReps = 0;
   bool _hasRecorded = false;
-  final ExpansionTileController _stepsController = ExpansionTileController();
+  final ExpansibleController _stepsController = ExpansibleController();
 
   Duration _elapsed = Duration.zero;
   Timer? _sessionTimer;
