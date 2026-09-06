@@ -4,3 +4,4 @@ __pycache__/
 .flet/
 data/
 .DS_Store
+build/
