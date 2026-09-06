@@ -7,13 +7,26 @@ from services.db_service import (
     get_average_fluency,
     get_minutes_per_day_last_7,
     get_recent_fluency_scores,
+    get_total_sessions_count,
+    get_sessions_count_by_category,
 )
+from models.exercise import ExerciseCategory
 from theme import colors
 
-ACHIEVEMENTS = [
-    ("local_fire_department", "Racha activa", "Segui practicando cada dia"),
-    ("mic", "Primera conversacion", "Completaste tu reto mas grande"),
+ACHIEVEMENT_DEFS = [
+    ("local_fire_department", "3 dias seguidos", "Constancia inicial desbloqueada", lambda: get_streak_days() >= 3),
+    ("local_fire_department", "7 dias seguidos", "Una semana completa de practica", lambda: get_streak_days() >= 7),
+    ("local_fire_department", "14 dias seguidos", "Dos semanas sin fallar", lambda: get_streak_days() >= 14),
+    ("mic", "Primera conversacion", "Completaste tu primer ejercicio de habla", lambda: get_sessions_count_by_category(ExerciseCategory.HABLA.value) >= 1),
+    ("menu_book", "Lector dedicado", "5 sesiones de lectura completadas", lambda: get_sessions_count_by_category(ExerciseCategory.LECTURA.value) >= 5),
+    ("air", "Respirando mejor", "5 sesiones de respiracion completadas", lambda: get_sessions_count_by_category(ExerciseCategory.RESPIRACION.value) >= 5),
+    ("bar_chart", "10 sesiones totales", "Ya llevas 10 practicas en Serena", lambda: get_total_sessions_count() >= 10),
+    ("bar_chart", "25 sesiones totales", "Un cuarto de centenar de practicas", lambda: get_total_sessions_count() >= 25),
 ]
+
+
+def get_unlocked_achievements():
+    return [(icon, title, subtitle) for icon, title, subtitle, condition in ACHIEVEMENT_DEFS if condition()]
 
 
 def build_stat_card(value: str, label: str) -> ft.Container:
@@ -122,6 +135,30 @@ def build_achievement_card(icon_name: str, title: str, subtitle: str) -> ft.Cont
     )
 
 
+def build_achievements_section() -> ft.Column:
+    unlocked = get_unlocked_achievements()
+    if not unlocked:
+        return ft.Column(
+            controls=[
+                ft.Container(
+                    bgcolor=colors.BG_CARD,
+                    border_radius=12,
+                    padding=16,
+                    content=ft.Text(
+                        "Todavia no tenes logros. Segui practicando para desbloquear el primero.",
+                        size=12,
+                        color=colors.TEXT_SECONDARY,
+                        text_align=ft.TextAlign.CENTER,
+                    ),
+                )
+            ]
+        )
+    return ft.Column(
+        spacing=10,
+        controls=[build_achievement_card(icon, title, subtitle) for icon, title, subtitle in unlocked],
+    )
+
+
 def build_progress_screen(page: ft.Page) -> ft.Container:
     return ft.Container(
         expand=True,
@@ -176,10 +213,7 @@ def build_progress_screen(page: ft.Page) -> ft.Container:
                         ],
                     ),
                 ),
-                ft.Column(
-                    spacing=10,
-                    controls=[build_achievement_card(icon, title, subtitle) for icon, title, subtitle in ACHIEVEMENTS],
-                ),
+                build_achievements_section(),
             ],
         ),
     )

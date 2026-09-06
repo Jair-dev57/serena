@@ -16,10 +16,11 @@ WAVE_MAX_HEIGHT = 36
 WAVE_TICK_SECONDS = 0.35
 
 
-def build_exercise_run_talk_screen(page: ft.Page, exercise, on_finish) -> ft.Container:
+def build_exercise_run_talk_screen(page: ft.Page, exercise, on_finish, repetitions: int = 3) -> ft.Container:
+    active_prompts = PROMPTS[:repetitions]
     state = {"prompt_index": 0, "seconds_elapsed": 0, "running": True}
 
-    prompt_text = ft.Text(PROMPTS[0], size=16, color=ft.Colors.WHITE, text_align=ft.TextAlign.CENTER)
+    prompt_text = ft.Text(active_prompts[0], size=16, color=ft.Colors.WHITE, text_align=ft.TextAlign.CENTER)
     timer_text = ft.Text("Grabando... 0:00", size=13, color=colors.TEXT_SECONDARY)
     step_bars = ft.Row(spacing=4)
 
@@ -46,7 +47,7 @@ def build_exercise_run_talk_screen(page: ft.Page, exercise, on_finish) -> ft.Con
     def render_step_bars():
         step_bars.controls = [
             ft.Container(expand=True, height=4, border_radius=2, bgcolor=colors.GREEN_SUCCESS if i <= state["prompt_index"] else colors.BG_CARD_ICON)
-            for i in range(len(PROMPTS))
+            for i in range(len(active_prompts))
         ]
 
     def format_time(seconds: int) -> str:
@@ -63,14 +64,14 @@ def build_exercise_run_talk_screen(page: ft.Page, exercise, on_finish) -> ft.Con
     def go_to_prompt(index: int):
         state["prompt_index"] = index
         state["seconds_elapsed"] = 0
-        prompt_text.value = PROMPTS[index]
+        prompt_text.value = active_prompts[index]
         timer_text.value = "Grabando... 0:00"
         render_step_bars()
         page.update()
 
     def advance():
         next_index = state["prompt_index"] + 1
-        if next_index < len(PROMPTS):
+        if next_index < len(active_prompts):
             go_to_prompt(next_index)
             return True
         state["running"] = False

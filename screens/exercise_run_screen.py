@@ -3,7 +3,7 @@ import flet as ft
 
 from theme import colors
 
-BREATHING_CYCLES = 4
+BREATHING_CYCLES_DEFAULT = 4
 SMALL_SIZE = 100
 LARGE_SIZE = 190
 
@@ -14,7 +14,7 @@ PHASES = [
 ]
 
 
-def build_exercise_run_screen(page: ft.Page, exercise, on_finish) -> ft.Container:
+def build_exercise_run_screen(page: ft.Page, exercise, on_finish, repetitions: int = BREATHING_CYCLES_DEFAULT) -> ft.Container:
     state = {"cycle": 0, "phase_index": 0, "seconds_left": PHASES[0][1], "paused": False, "running": True}
 
     phase_label = ft.Text(PHASES[0][0], size=19, weight=ft.FontWeight.W_500, color=ft.Colors.WHITE, text_align=ft.TextAlign.CENTER)
@@ -36,7 +36,7 @@ def build_exercise_run_screen(page: ft.Page, exercise, on_finish) -> ft.Containe
     def render_step_bars():
         step_bars.controls = [
             ft.Container(expand=True, height=4, border_radius=2, bgcolor=colors.GREEN_SUCCESS if i < state["cycle"] else colors.BG_CARD_ICON)
-            for i in range(BREATHING_CYCLES)
+            for i in range(repetitions)
         ]
 
     def go_to_phase(cycle: int, phase_index: int):
@@ -61,7 +61,7 @@ def build_exercise_run_screen(page: ft.Page, exercise, on_finish) -> ft.Containe
             go_to_phase(state["cycle"], next_phase)
             return True
         next_cycle = state["cycle"] + 1
-        if next_cycle < BREATHING_CYCLES:
+        if next_cycle < repetitions:
             go_to_phase(next_cycle, 0)
             return True
         state["running"] = False

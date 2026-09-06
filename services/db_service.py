@@ -219,3 +219,53 @@ def update_preference(key: str, value) -> None:
     conn.execute(f"UPDATE preferences SET {key} = ? WHERE id = 1", (value,))
     conn.commit()
     conn.close()
+
+
+def init_settings_table() -> None:
+    conn = get_connection()
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS settings_kv (
+            key TEXT PRIMARY KEY,
+            value TEXT NOT NULL
+        )
+    """)
+    conn.commit()
+    conn.close()
+
+
+def get_setting(key: str, default: str = None) -> str:
+    conn = get_connection()
+    row = conn.execute("SELECT value FROM settings_kv WHERE key = ?", (key,)).fetchone()
+    conn.close()
+    return row["value"] if row else default
+
+
+def set_setting(key: str, value: str) -> None:
+    conn = get_connection()
+    conn.execute(
+        "INSERT INTO settings_kv (key, value) VALUES (?, ?) ON CONFLICT(key) DO UPDATE SET value = excluded.value",
+        (key, value),
+    )
+    conn.commit()
+    conn.close()
+
+
+def get_total_sessions_count() -> int:
+    conn = get_connection()
+    count = conn.execute("SELECT COUNT(*) FROM practice_sessions").fetchone()[0]
+    conn.close()
+    return count
+
+
+def get_sessions_count_by_category(category_value: str) -> int:
+    conn = get_connection()
+    count = conn.execute(
+        """
+        SELECT COUNT(*) FROM practice_sessions ps
+        JOIN exercises e ON ps.exercise_id = e.id
+        WHERE e.category = ?
+        """,
+        (category_value,),
+    ).fetchone()[0]
+    conn.close()
+    return count

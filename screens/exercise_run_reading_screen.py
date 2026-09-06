@@ -17,13 +17,14 @@ SECONDS_PER_PHRASE = 6
 BPM_SECONDS = 1.0
 
 
-def build_exercise_run_reading_screen(page: ft.Page, exercise, on_finish) -> ft.Container:
+def build_exercise_run_reading_screen(page: ft.Page, exercise, on_finish, repetitions: int = 6) -> ft.Container:
+    active_phrases = PHRASES[:repetitions]
     state = {"phrase_index": 0, "seconds_left": SECONDS_PER_PHRASE, "pulse": 0, "paused": False, "running": True}
 
     tick_audio = fta.Audio(src="tick.wav", autoplay=False, volume=1.0)
     page.overlay.append(tick_audio)
 
-    phrase_text = ft.Text(PHRASES[0], size=20, color=ft.Colors.WHITE, text_align=ft.TextAlign.CENTER)
+    phrase_text = ft.Text(active_phrases[0], size=20, color=ft.Colors.WHITE, text_align=ft.TextAlign.CENTER)
     bpm_label = ft.Text("60 ppm", size=12, color=colors.TEXT_SECONDARY)
     step_bars = ft.Row(spacing=4)
     dots_row = ft.Row(spacing=8, alignment=ft.MainAxisAlignment.CENTER)
@@ -32,7 +33,7 @@ def build_exercise_run_reading_screen(page: ft.Page, exercise, on_finish) -> ft.
     def render_step_bars():
         step_bars.controls = [
             ft.Container(expand=True, height=4, border_radius=2, bgcolor=colors.GREEN_SUCCESS if i <= state["phrase_index"] else colors.BG_CARD_ICON)
-            for i in range(len(PHRASES))
+            for i in range(len(active_phrases))
         ]
 
     def render_dots():
@@ -44,13 +45,13 @@ def build_exercise_run_reading_screen(page: ft.Page, exercise, on_finish) -> ft.
     def go_to_phrase(index: int):
         state["phrase_index"] = index
         state["seconds_left"] = SECONDS_PER_PHRASE
-        phrase_text.value = PHRASES[index]
+        phrase_text.value = active_phrases[index]
         render_step_bars()
         page.update()
 
     def advance():
         next_index = state["phrase_index"] + 1
-        if next_index < len(PHRASES):
+        if next_index < len(active_phrases):
             go_to_phrase(next_index)
             return True
         state["running"] = False
