@@ -1,6 +1,6 @@
 import flet as ft
 
-from services.db_service import get_all_exercises
+from services.db_service import get_all_exercises, get_streak_days
 from theme import colors
 
 
@@ -28,7 +28,7 @@ def build_home_screen(page: ft.Page, on_start=None) -> ft.Container:
                     spacing=4,
                     controls=[
                         ft.Icon(ft.Icons.LOCAL_FIRE_DEPARTMENT, size=14, color=ft.Colors.WHITE),
-                        ft.Text("12 dias", size=12, weight=ft.FontWeight.W_500, color=ft.Colors.WHITE),
+                        ft.Text(f"{get_streak_days()} dias", size=12, weight=ft.FontWeight.W_500, color=ft.Colors.WHITE),
                     ],
                 ),
             ),

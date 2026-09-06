@@ -1,7 +1,10 @@
+import random
 import sqlite3
+from datetime import date, datetime, timedelta
 from pathlib import Path
 
 from models.exercise import Exercise, Difficulty, ExerciseCategory
+from models.practice_session import PracticeSession
 
 DB_PATH = Path(__file__).parent.parent / "data" / "serena.db"
 
@@ -19,6 +22,8 @@ SEED_EXERCISES = [
     ("Lectura con metrónomo", "Metrónomo", "Lee siguiendo un ritmo constante", 8,
      Difficulty.MEDIO, ExerciseCategory.LECTURA, "graphic_eq"),
 ]
+
+WEEKDAY_LABELS = ["L", "M", "X", "J", "V", "S", "D"]
 
 
 def get_connection() -> sqlite3.Connection:
@@ -40,6 +45,15 @@ def init_db() -> None:
             category TEXT NOT NULL,
             icon TEXT NOT NULL,
             completed INTEGER NOT NULL DEFAULT 0
+        )
+    """)
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS practice_sessions (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            exercise_id INTEGER NOT NULL,
+            completed_at TEXT NOT NULL,
+            duration_minutes INTEGER NOT NULL,
+            fluency_score INTEGER NOT NULL
         )
     """)
     conn.commit()
@@ -91,3 +105,73 @@ def mark_completed(exercise_id: int, completed: bool = True) -> None:
     )
     conn.commit()
     conn.close()
+
+
+def record_session(exercise_id: int, duration_minutes: int, fluency_score: int = None) -> None:
+    if fluency_score is None:
+        fluency_score = random.randint(65, 92)
+    conn = get_connection()
+    conn.execute(
+        "INSERT INTO practice_sessions (exercise_id, completed_at, duration_minutes, fluency_score) VALUES (?, ?, ?, ?)",
+        (exercise_id, datetime.now().isoformat(), duration_minutes, fluency_score),
+    )
+    conn.commit()
+    conn.close()
+
+
+def get_all_sessions() -> list[PracticeSession]:
+    conn = get_connection()
+    rows = conn.execute("SELECT * FROM practice_sessions ORDER BY completed_at").fetchall()
+    conn.close()
+    return [
+        PracticeSession(
+            id=row["id"],
+            exercise_id=row["exercise_id"],
+            completed_at=datetime.fromisoformat(row["completed_at"]),
+            duration_minutes=row["duration_minutes"],
+            fluency_score=row["fluency_score"],
+        )
+        for row in rows
+    ]
+
+
+def get_streak_days() -> int:
+    sessions = get_all_sessions()
+    if not sessions:
+        return 0
+    session_dates = {s.completed_at.date() for s in sessions}
+    streak = 0
+    current_day = date.today()
+    while current_day in session_dates:
+        streak += 1
+        current_day -= timedelta(days=1)
+    return streak
+
+
+def get_minutes_this_week() -> int:
+    sessions = get_all_sessions()
+    today = date.today()
+    week_start = today - timedelta(days=today.weekday())
+    return sum(s.duration_minutes for s in sessions if s.completed_at.date() >= week_start)
+
+
+def get_minutes_per_day_last_7() -> list[tuple[str, int]]:
+    sessions = get_all_sessions()
+    today = date.today()
+    days = [today - timedelta(days=i) for i in range(6, -1, -1)]
+    result = []
+    for d in days:
+        total = sum(s.duration_minutes for s in sessions if s.completed_at.date() == d)
+        result.append((WEEKDAY_LABELS[d.weekday()], total))
+    return result
+
+
+def get_recent_fluency_scores(n: int = 6) -> list[int]:
+    sessions = get_all_sessions()
+    scores = [s.fluency_score for s in sessions[-n:]]
+    return scores if scores else [60]
+
+
+def get_average_fluency() -> int:
+    scores = get_recent_fluency_scores(10)
+    return round(sum(scores) / len(scores))

@@ -1,6 +1,6 @@
 import flet as ft
 
-from services.db_service import init_db, mark_completed
+from services.db_service import init_db, mark_completed, record_session
 from screens.exercises_screen import build_exercises_screen
 from screens.home_screen import build_home_screen
 from screens.progress_screen import build_progress_screen
@@ -40,6 +40,7 @@ def main(page: ft.Page):
     def on_finish_exercise(finished_exercise):
         if finished_exercise:
             mark_completed(finished_exercise.id, completed=True)
+            record_session(finished_exercise.id, finished_exercise.duration_minutes)
         show_screen(nav_state["index"])
 
     def on_start_exercise(exercise):

@@ -1,14 +1,17 @@
 import flet as ft
 import flet_charts as fch
 
+from services.db_service import (
+    get_streak_days,
+    get_minutes_this_week,
+    get_average_fluency,
+    get_minutes_per_day_last_7,
+    get_recent_fluency_scores,
+)
 from theme import colors
 
-DAYS = ["L", "M", "X", "J", "V", "S", "D"]
-MINUTES_PER_DAY = [12, 15, 5, 18, 25, 14, 10]
-FLUENCY_SCORES = [58, 62, 65, 63, 68, 74]
-
 ACHIEVEMENTS = [
-    ("local_fire_department", "7 dias seguidos", "Constancia desbloqueada"),
+    ("local_fire_department", "Racha activa", "Segui practicando cada dia"),
     ("mic", "Primera conversacion", "Completaste tu reto mas grande"),
 ]
 
@@ -31,10 +34,11 @@ def build_stat_card(value: str, label: str) -> ft.Container:
 
 
 def build_bar_chart() -> fch.BarChart:
-    max_val = max(MINUTES_PER_DAY)
+    data = get_minutes_per_day_last_7()
+    max_val = max((minutes for _, minutes in data), default=1) or 1
     groups = []
-    for i, minutes in enumerate(MINUTES_PER_DAY):
-        is_peak = minutes == max_val
+    for i, (day_label, minutes) in enumerate(data):
+        is_peak = minutes == max_val and minutes > 0
         groups.append(
             fch.BarChartGroup(
                 x=i,
@@ -55,8 +59,8 @@ def build_bar_chart() -> fch.BarChart:
         height=140,
         bottom_axis=fch.ChartAxis(
             labels=[
-                fch.ChartAxisLabel(value=i, label=ft.Text(day, size=11, color=colors.TEXT_SECONDARY))
-                for i, day in enumerate(DAYS)
+                fch.ChartAxisLabel(value=i, label=ft.Text(day_label, size=11, color=colors.TEXT_SECONDARY))
+                for i, (day_label, _) in enumerate(data)
             ],
             label_size=20,
         ),
@@ -67,7 +71,8 @@ def build_bar_chart() -> fch.BarChart:
 
 
 def build_line_chart() -> fch.LineChart:
-    points = [fch.LineChartDataPoint(i, score) for i, score in enumerate(FLUENCY_SCORES)]
+    scores = get_recent_fluency_scores(6)
+    points = [fch.LineChartDataPoint(i, score) for i, score in enumerate(scores)]
     return fch.LineChart(
         data_series=[
             fch.LineChartData(
@@ -83,8 +88,8 @@ def build_line_chart() -> fch.LineChart:
         bottom_axis=fch.ChartAxis(show_labels=False),
         border=ft.Border.all(0, ft.Colors.TRANSPARENT),
         interactive=False,
-        min_y=min(FLUENCY_SCORES) - 5,
-        max_y=max(FLUENCY_SCORES) + 5,
+        min_y=max(0, min(scores) - 5),
+        max_y=max(scores) + 5,
     )
 
 
@@ -137,9 +142,9 @@ def build_progress_screen(page: ft.Page) -> ft.Container:
                 ft.Row(
                     spacing=12,
                     controls=[
-                        build_stat_card("12", "DIAS SEGUIDOS"),
-                        build_stat_card("92", "MIN. ESTA SEMANA"),
-                        build_stat_card("74%", "FLUIDEZ"),
+                        build_stat_card(str(get_streak_days()), "DIAS SEGUIDOS"),
+                        build_stat_card(str(get_minutes_this_week()), "MIN. ESTA SEMANA"),
+                        build_stat_card(f"{get_average_fluency()}%", "FLUIDEZ"),
                     ],
                 ),
                 ft.Container(
@@ -162,7 +167,7 @@ def build_progress_screen(page: ft.Page) -> ft.Container:
                         spacing=10,
                         controls=[
                             ft.Text(
-                                "Puntaje de fluidez - ultimas 6 semanas",
+                                "Puntaje de fluidez - ultimas sesiones",
                                 size=13,
                                 weight=ft.FontWeight.W_500,
                                 color=colors.TEXT_PRIMARY,
