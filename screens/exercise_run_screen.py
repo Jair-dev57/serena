@@ -4,10 +4,13 @@ import flet as ft
 from theme import colors
 
 BREATHING_CYCLES = 4
+SMALL_SIZE = 100
+LARGE_SIZE = 190
+
 PHASES = [
-    ("Inhala", 4, "Inhala lento por la nariz"),
-    ("Sosten", 7, "Manten el aire en tus pulmones, relaja los hombros"),
-    ("Exhala", 8, "Suelta el aire despacio por la boca"),
+    ("Inhala", 4, "Inhala lento por la nariz", LARGE_SIZE, ft.Icons.ARROW_UPWARD, "Inhalando"),
+    ("Sosten", 7, "Manten el aire en tus pulmones, relaja los hombros", LARGE_SIZE, ft.Icons.PAUSE, "Sostiene"),
+    ("Exhala", 8, "Suelta el aire despacio por la boca", SMALL_SIZE, ft.Icons.ARROW_DOWNWARD, "Exhalando"),
 ]
 
 
@@ -17,9 +20,18 @@ def build_exercise_run_screen(page: ft.Page, exercise, on_finish) -> ft.Containe
     phase_label = ft.Text(PHASES[0][0], size=19, weight=ft.FontWeight.W_500, color=ft.Colors.WHITE, text_align=ft.TextAlign.CENTER)
     instruction_text = ft.Text(PHASES[0][2], size=13, color=colors.TEXT_SECONDARY, text_align=ft.TextAlign.CENTER)
     seconds_text = ft.Text(str(PHASES[0][1]), size=32, weight=ft.FontWeight.W_300, color=ft.Colors.WHITE)
-    progress_ring = ft.ProgressRing(value=1.0, width=150, height=150, stroke_width=8, color=colors.BLUE_ACCENT, bgcolor=colors.BG_CARD_ICON)
     step_bars = ft.Row(spacing=4)
     pause_icon = ft.Icon(ft.Icons.PAUSE, color=colors.TEXT_SECONDARY, size=18)
+    direction_icon = ft.Icon(PHASES[0][4], size=14, color=colors.BLUE_ACCENT)
+    direction_label = ft.Text(PHASES[0][5], size=11, color=colors.TEXT_SECONDARY)
+
+    breathing_circle = ft.Container(
+        width=SMALL_SIZE,
+        height=SMALL_SIZE,
+        border_radius=999,
+        bgcolor=colors.BLUE_ACCENT,
+        animate=ft.Animation(PHASES[0][1] * 1000, ft.AnimationCurve.EASE_IN_OUT),
+    )
 
     def render_step_bars():
         step_bars.controls = [
@@ -30,12 +42,16 @@ def build_exercise_run_screen(page: ft.Page, exercise, on_finish) -> ft.Containe
     def go_to_phase(cycle: int, phase_index: int):
         state["cycle"] = cycle
         state["phase_index"] = phase_index
-        name, duration, instruction = PHASES[phase_index]
+        name, duration, instruction, target_size, icon, label = PHASES[phase_index]
         state["seconds_left"] = duration
         phase_label.value = name
         instruction_text.value = instruction
         seconds_text.value = str(duration)
-        progress_ring.value = 1.0
+        direction_icon.name = icon
+        direction_label.value = label
+        breathing_circle.animate = ft.Animation(duration * 1000, ft.AnimationCurve.EASE_IN_OUT)
+        breathing_circle.width = target_size
+        breathing_circle.height = target_size
         render_step_bars()
         page.update()
 
@@ -53,13 +69,16 @@ def build_exercise_run_screen(page: ft.Page, exercise, on_finish) -> ft.Containe
         return False
 
     async def timer_loop():
+        await asyncio.sleep(0.15)
+        breathing_circle.width = LARGE_SIZE
+        breathing_circle.height = LARGE_SIZE
+        page.update()
+
         while state["running"]:
             await asyncio.sleep(1)
             if state["paused"] or not state["running"]:
                 continue
             state["seconds_left"] -= 1
-            _, duration, _ = PHASES[state["phase_index"]]
-            progress_ring.value = max(0.0, state["seconds_left"] / duration)
             seconds_text.value = str(max(0, state["seconds_left"]))
             page.update()
             if state["seconds_left"] <= 0:
@@ -87,6 +106,7 @@ def build_exercise_run_screen(page: ft.Page, exercise, on_finish) -> ft.Containe
         content=ft.Column(
             expand=True,
             spacing=0,
+            horizontal_alignment=ft.CrossAxisAlignment.CENTER,
             controls=[
                 ft.Row(
                     alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
@@ -100,18 +120,21 @@ def build_exercise_run_screen(page: ft.Page, exercise, on_finish) -> ft.Containe
                 ft.Text(exercise.name.upper(), size=11, weight=ft.FontWeight.W_500, color=colors.BLUE_ACCENT, text_align=ft.TextAlign.CENTER),
                 ft.Container(height=6),
                 phase_label,
-                ft.Container(height=28),
+                ft.Container(height=20),
                 ft.Container(
-                    alignment=ft.Alignment.CENTER,
+                    width=220,
+                    height=220,
                     content=ft.Stack(
+                        alignment=ft.Alignment.CENTER,
                         controls=[
-                            progress_ring,
+                            ft.Container(alignment=ft.Alignment.CENTER, width=220, height=220, content=breathing_circle),
                             ft.Container(
-                                width=150,
-                                height=150,
                                 alignment=ft.Alignment.CENTER,
+                                width=220,
+                                height=220,
                                 content=ft.Column(
                                     horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+                                    alignment=ft.MainAxisAlignment.CENTER,
                                     spacing=0,
                                     controls=[seconds_text, ft.Text("segundos", size=11, color=colors.TEXT_SECONDARY)],
                                 ),
@@ -119,7 +142,9 @@ def build_exercise_run_screen(page: ft.Page, exercise, on_finish) -> ft.Containe
                         ],
                     ),
                 ),
-                ft.Container(height=24),
+                ft.Container(height=8),
+                ft.Row(alignment=ft.MainAxisAlignment.CENTER, spacing=4, controls=[direction_icon, direction_label]),
+                ft.Container(height=16),
                 instruction_text,
                 ft.Container(expand=True),
                 ft.Row(
