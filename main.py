@@ -1,6 +1,6 @@
 import flet as ft
 
-from services.db_service import init_db, mark_completed, record_session
+from services.db_service import init_db, mark_completed, record_session, init_preferences_table
 from screens.exercises_screen import build_exercises_screen
 from screens.home_screen import build_home_screen
 from screens.progress_screen import build_progress_screen
@@ -20,6 +20,7 @@ def main(page: ft.Page):
     page.padding = 0
 
     init_db()
+    init_preferences_table()
 
     content = ft.Container(expand=True)
     nav_state = {"index": 0}

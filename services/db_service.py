@@ -175,3 +175,47 @@ def get_recent_fluency_scores(n: int = 6) -> list[int]:
 def get_average_fluency() -> int:
     scores = get_recent_fluency_scores(10)
     return round(sum(scores) / len(scores))
+
+
+def init_preferences_table() -> None:
+    conn = get_connection()
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS preferences (
+            id INTEGER PRIMARY KEY CHECK (id = 1),
+            daily_goal INTEGER NOT NULL DEFAULT 15,
+            reminders INTEGER NOT NULL DEFAULT 1,
+            sounds INTEGER NOT NULL DEFAULT 1,
+            share_therapist INTEGER NOT NULL DEFAULT 0
+        )
+    """)
+    conn.commit()
+
+    row = conn.execute("SELECT COUNT(*) FROM preferences WHERE id = 1").fetchone()[0]
+    if row == 0:
+        conn.execute("INSERT INTO preferences (id) VALUES (1)")
+        conn.commit()
+
+    conn.close()
+
+
+def get_preferences() -> dict:
+    conn = get_connection()
+    row = conn.execute("SELECT * FROM preferences WHERE id = 1").fetchone()
+    conn.close()
+    return {
+        "daily_goal": row["daily_goal"],
+        "reminders": bool(row["reminders"]),
+        "sounds": bool(row["sounds"]),
+        "share_therapist": bool(row["share_therapist"]),
+    }
+
+
+def update_preference(key: str, value) -> None:
+    if key not in ("daily_goal", "reminders", "sounds", "share_therapist"):
+        raise ValueError(f"Preferencia desconocida: {key}")
+    if isinstance(value, bool):
+        value = int(value)
+    conn = get_connection()
+    conn.execute(f"UPDATE preferences SET {key} = ? WHERE id = 1", (value,))
+    conn.commit()
+    conn.close()

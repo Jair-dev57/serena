@@ -1,27 +1,25 @@
 import flet as ft
 
+from services.db_service import get_preferences, update_preference
 from theme import colors
 
 
 def build_profile_screen(page: ft.Page) -> ft.Container:
-    state = {
-        "daily_goal": 15,
-        "reminders": True,
-        "sounds": True,
-        "share_therapist": False,
-    }
+    prefs = get_preferences()
 
-    goal_text = ft.Text(f"{state['daily_goal']} min", size=14, weight=ft.FontWeight.W_500, color=colors.TEXT_PRIMARY)
+    goal_text = ft.Text(f"{prefs['daily_goal']} min", size=14, weight=ft.FontWeight.W_500, color=colors.TEXT_PRIMARY)
 
     def change_goal(delta: int):
-        new_value = max(5, min(60, state["daily_goal"] + delta))
-        state["daily_goal"] = new_value
+        new_value = max(5, min(60, prefs["daily_goal"] + delta))
+        prefs["daily_goal"] = new_value
         goal_text.value = f"{new_value} min"
+        update_preference("daily_goal", new_value)
         page.update()
 
     def build_toggle_row(icon_name: str, title: str, subtitle: str, key: str) -> ft.Container:
         def on_toggle(e):
-            state[key] = e.control.value
+            prefs[key] = e.control.value
+            update_preference(key, e.control.value)
 
         return ft.Container(
             padding=ft.Padding.symmetric(vertical=10),
@@ -37,7 +35,7 @@ def build_profile_screen(page: ft.Page) -> ft.Container:
                             ft.Text(subtitle, size=11, color=colors.TEXT_SECONDARY),
                         ],
                     ),
-                    ft.Switch(value=state[key], active_color=colors.BLUE_ACCENT, on_change=on_toggle),
+                    ft.Switch(value=prefs[key], active_color=colors.BLUE_ACCENT, on_change=on_toggle),
                 ],
             ),
         )
