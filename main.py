@@ -7,6 +7,7 @@ from screens.progress_screen import build_progress_screen
 from screens.profile_screen import build_profile_screen
 from screens.exercise_run_screen import build_exercise_run_screen
 from screens.exercise_run_reading_screen import build_exercise_run_reading_screen
+from screens.exercise_run_talk_screen import build_exercise_run_talk_screen
 from widgets.bottom_nav import build_bottom_nav
 from theme import colors
 from models.exercise import ExerciseCategory
@@ -48,6 +49,8 @@ def main(page: ft.Page):
             content.content = build_exercise_run_screen(page, exercise, on_finish_exercise)
         elif exercise.category == ExerciseCategory.LECTURA:
             content.content = build_exercise_run_reading_screen(page, exercise, on_finish_exercise)
+        elif exercise.category == ExerciseCategory.HABLA:
+            content.content = build_exercise_run_talk_screen(page, exercise, on_finish_exercise)
         else:
             nav.visible = True
             page.show_dialog(ft.SnackBar(ft.Text("Este tipo de ejercicio todavia no esta listo")))
