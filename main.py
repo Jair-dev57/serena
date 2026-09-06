@@ -1,10 +1,11 @@
 import flet as ft
 
-from services.db_service import init_db
 from screens.exercises_screen import build_exercises_screen
 from screens.home_screen import build_home_screen
-from widgets.bottom_nav import build_bottom_nav
+from screens.progress_screen import build_progress_screen
+from services.db_service import init_db
 from theme import colors
+from widgets.bottom_nav import build_bottom_nav
 
 
 def main(page: ft.Page):
@@ -22,6 +23,8 @@ def main(page: ft.Page):
             content.content = build_home_screen(page)
         elif index == 1:
             content.content = build_exercises_screen(page)
+        elif index == 2:
+            content.content = build_progress_screen(page)
         else:
             content.content = ft.Container(
                 expand=True,
