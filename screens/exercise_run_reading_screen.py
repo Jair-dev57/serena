@@ -1,5 +1,6 @@
 import asyncio
 import flet as ft
+import flet_audio as fta
 
 from theme import colors
 
@@ -18,6 +19,9 @@ BPM_SECONDS = 1.0
 
 def build_exercise_run_reading_screen(page: ft.Page, exercise, on_finish) -> ft.Container:
     state = {"phrase_index": 0, "seconds_left": SECONDS_PER_PHRASE, "pulse": 0, "paused": False, "running": True}
+
+    tick_audio = fta.Audio(src="tick.wav", autoplay=False, volume=1.0)
+    page.overlay.append(tick_audio)
 
     phrase_text = ft.Text(PHRASES[0], size=20, color=ft.Colors.WHITE, text_align=ft.TextAlign.CENTER)
     bpm_label = ft.Text("60 ppm", size=12, color=colors.TEXT_SECONDARY)
@@ -60,6 +64,10 @@ def build_exercise_run_reading_screen(page: ft.Page, exercise, on_finish) -> ft.
                 continue
             state["pulse"] = (state["pulse"] + 1) % 3
             render_dots()
+            try:
+                await tick_audio.play()
+            except Exception:
+                pass
             state["seconds_left"] -= 1
             page.update()
             if state["seconds_left"] <= 0:
@@ -88,6 +96,7 @@ def build_exercise_run_reading_screen(page: ft.Page, exercise, on_finish) -> ft.
         content=ft.Column(
             expand=True,
             spacing=0,
+            horizontal_alignment=ft.CrossAxisAlignment.CENTER,
             controls=[
                 ft.Row(
                     alignment=ft.MainAxisAlignment.SPACE_BETWEEN,

@@ -1,4 +1,5 @@
 import asyncio
+import random
 import flet as ft
 
 from theme import colors
@@ -9,15 +10,19 @@ PROMPTS = [
     "Cuentame sobre algo que te gustaria aprender.",
 ]
 
+WAVE_BAR_COUNT = 7
+WAVE_MIN_HEIGHT = 6
+WAVE_MAX_HEIGHT = 36
+WAVE_TICK_SECONDS = 0.35
+
 
 def build_exercise_run_talk_screen(page: ft.Page, exercise, on_finish) -> ft.Container:
-    state = {"prompt_index": 0, "seconds_elapsed": 0, "pulse": True, "running": True}
+    state = {"prompt_index": 0, "seconds_elapsed": 0, "running": True}
 
     prompt_text = ft.Text(PROMPTS[0], size=16, color=ft.Colors.WHITE, text_align=ft.TextAlign.CENTER)
     timer_text = ft.Text("Grabando... 0:00", size=13, color=colors.TEXT_SECONDARY)
     step_bars = ft.Row(spacing=4)
-    outer_ring = ft.Container(width=120, height=120, border_radius=60, bgcolor="rgba(127,179,224,0.12)")
-    mid_ring = ft.Container(width=90, height=90, border_radius=45, bgcolor="rgba(127,179,224,0.20)")
+
     mic_circle = ft.Container(
         width=64,
         height=64,
@@ -27,6 +32,17 @@ def build_exercise_run_talk_screen(page: ft.Page, exercise, on_finish) -> ft.Con
         content=ft.Icon(ft.Icons.MIC, size=26, color=colors.BG_PAGE),
     )
 
+    wave_bars = []
+    for _ in range(WAVE_BAR_COUNT):
+        bar = ft.Container(
+            width=6,
+            height=WAVE_MIN_HEIGHT,
+            border_radius=3,
+            bgcolor=colors.BLUE_ACCENT,
+            animate=ft.Animation(int(WAVE_TICK_SECONDS * 1000), ft.AnimationCurve.EASE_IN_OUT),
+        )
+        wave_bars.append(bar)
+
     def render_step_bars():
         step_bars.controls = [
             ft.Container(expand=True, height=4, border_radius=2, bgcolor=colors.GREEN_SUCCESS if i <= state["prompt_index"] else colors.BG_CARD_ICON)
@@ -35,6 +51,14 @@ def build_exercise_run_talk_screen(page: ft.Page, exercise, on_finish) -> ft.Con
 
     def format_time(seconds: int) -> str:
         return f"{seconds // 60}:{seconds % 60:02d}"
+
+    def randomize_waves():
+        for bar in wave_bars:
+            bar.height = random.randint(WAVE_MIN_HEIGHT, WAVE_MAX_HEIGHT)
+
+    def reset_waves():
+        for bar in wave_bars:
+            bar.height = WAVE_MIN_HEIGHT
 
     def go_to_prompt(index: int):
         state["prompt_index"] = index
@@ -53,16 +77,19 @@ def build_exercise_run_talk_screen(page: ft.Page, exercise, on_finish) -> ft.Con
         on_finish(exercise)
         return False
 
-    async def timer_loop():
+    async def wave_loop():
+        tick = 0
         while state["running"]:
-            await asyncio.sleep(1)
+            await asyncio.sleep(WAVE_TICK_SECONDS)
             if not state["running"]:
                 continue
-            state["seconds_elapsed"] += 1
-            timer_text.value = f"Grabando... {format_time(state['seconds_elapsed'])}"
-            state["pulse"] = not state["pulse"]
-            outer_ring.bgcolor = "rgba(127,179,224,0.20)" if state["pulse"] else "rgba(127,179,224,0.12)"
+            randomize_waves()
             page.update()
+            tick += 1
+            if tick % 3 == 0:
+                state["seconds_elapsed"] += 1
+                timer_text.value = f"Grabando... {format_time(state['seconds_elapsed'])}"
+                page.update()
 
     def on_skip_click(e):
         advance()
@@ -75,7 +102,7 @@ def build_exercise_run_talk_screen(page: ft.Page, exercise, on_finish) -> ft.Con
         on_finish(None)
 
     render_step_bars()
-    page.run_task(timer_loop)
+    page.run_task(wave_loop)
 
     return ft.Container(
         expand=True,
@@ -84,6 +111,7 @@ def build_exercise_run_talk_screen(page: ft.Page, exercise, on_finish) -> ft.Con
         content=ft.Column(
             expand=True,
             spacing=0,
+            horizontal_alignment=ft.CrossAxisAlignment.CENTER,
             controls=[
                 ft.Row(
                     alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
@@ -103,21 +131,15 @@ def build_exercise_run_talk_screen(page: ft.Page, exercise, on_finish) -> ft.Con
                     content=prompt_text,
                 ),
                 ft.Container(height=28),
-                ft.Container(
-                    alignment=ft.Alignment.CENTER,
-                    content=ft.Stack(
-                        controls=[
-                            outer_ring,
-                            ft.Container(
-                                width=120,
-                                height=120,
-                                alignment=ft.Alignment.CENTER,
-                                content=ft.Stack(controls=[mid_ring, ft.Container(width=90, height=90, alignment=ft.Alignment.CENTER, content=mic_circle)]),
-                            ),
-                        ],
-                    ),
+                mic_circle,
+                ft.Container(height=20),
+                ft.Row(
+                    alignment=ft.MainAxisAlignment.CENTER,
+                    vertical_alignment=ft.CrossAxisAlignment.END,
+                    spacing=5,
+                    controls=wave_bars,
                 ),
-                ft.Container(height=16),
+                ft.Container(height=12),
                 ft.Row(alignment=ft.MainAxisAlignment.CENTER, controls=[timer_text]),
                 ft.Container(expand=True),
                 ft.Row(
