@@ -1,11 +1,12 @@
 import flet as ft
 
+from services.db_service import init_db
 from screens.exercises_screen import build_exercises_screen
 from screens.home_screen import build_home_screen
 from screens.progress_screen import build_progress_screen
-from services.db_service import init_db
-from theme import colors
+from screens.profile_screen import build_profile_screen
 from widgets.bottom_nav import build_bottom_nav
+from theme import colors
 
 
 def main(page: ft.Page):
@@ -26,12 +27,7 @@ def main(page: ft.Page):
         elif index == 2:
             content.content = build_progress_screen(page)
         else:
-            content.content = ft.Container(
-                expand=True,
-                bgcolor=colors.BG_PAGE,
-                alignment=ft.Alignment.CENTER,
-                content=ft.Text("Proximamente", color=colors.TEXT_SECONDARY),
-            )
+            content.content = build_profile_screen(page)
         page.update()
 
     def on_nav_change(e):
