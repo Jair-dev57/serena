@@ -4,7 +4,7 @@ from services.db_service import get_all_exercises
 from theme import colors
 
 
-def build_home_screen(page: ft.Page) -> ft.Container:
+def build_home_screen(page: ft.Page, on_start=None) -> ft.Container:
     exercises = get_all_exercises()
     featured = next((e for e in exercises if not e.completed), exercises[0] if exercises else None)
     others = [e for e in exercises if featured is None or e.id != featured.id][:4]
@@ -61,6 +61,7 @@ def build_home_screen(page: ft.Page) -> ft.Container:
                         padding=ft.Padding.symmetric(horizontal=24, vertical=10),
                         border_radius=20,
                         bgcolor=colors.BLUE_ACCENT,
+                        on_click=(lambda e: on_start(featured)) if on_start else None,
                         content=ft.Row(
                             spacing=6,
                             alignment=ft.MainAxisAlignment.CENTER,
@@ -92,11 +93,7 @@ def build_home_screen(page: ft.Page) -> ft.Container:
                         content=ft.Icon(getattr(ft.Icons, exercise.icon.upper()), size=16, color=colors.BLUE_ACCENT),
                     ),
                     ft.Text(exercise.name, size=13, weight=ft.FontWeight.W_500, color=colors.TEXT_PRIMARY),
-                    ft.Text(
-                        f"{exercise.duration_minutes} min · {exercise.difficulty.value}",
-                        size=11,
-                        color=colors.TEXT_SECONDARY,
-                    ),
+                    ft.Text(f"{exercise.duration_minutes} min · {exercise.difficulty.value}", size=11, color=colors.TEXT_SECONDARY),
                 ],
             ),
         )

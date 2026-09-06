@@ -1,9 +1,9 @@
 import flet as ft
 
-from services.db_service import get_all_exercises, mark_completed
 from models.exercise import ExerciseCategory
-from widgets.exercise_card import build_exercise_card
+from services.db_service import get_all_exercises, mark_completed
 from theme import colors
+from widgets.exercise_card import build_exercise_card
 
 FILTERS = ["Todos"] + [c.value for c in ExerciseCategory]
 
