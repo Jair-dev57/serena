@@ -6,6 +6,7 @@ from screens.home_screen import build_home_screen
 from screens.progress_screen import build_progress_screen
 from screens.profile_screen import build_profile_screen
 from screens.exercise_run_screen import build_exercise_run_screen
+from screens.exercise_run_reading_screen import build_exercise_run_reading_screen
 from widgets.bottom_nav import build_bottom_nav
 from theme import colors
 from models.exercise import ExerciseCategory
@@ -35,19 +36,24 @@ def main(page: ft.Page):
         nav.visible = True
         page.update()
 
-    def on_start_exercise(exercise):
-        if exercise.category != ExerciseCategory.RESPIRACION:
-            page.show_dialog(ft.SnackBar(ft.Text("Este tipo de ejercicio todavia no esta listo")))
-            return
+    def on_finish_exercise(finished_exercise):
+        if finished_exercise:
+            mark_completed(finished_exercise.id, completed=True)
+        show_screen(nav_state["index"])
 
+    def on_start_exercise(exercise):
         nav.visible = False
 
-        def on_finish(finished_exercise):
-            if finished_exercise:
-                mark_completed(finished_exercise.id, completed=True)
-            show_screen(nav_state["index"])
+        if exercise.category == ExerciseCategory.RESPIRACION:
+            content.content = build_exercise_run_screen(page, exercise, on_finish_exercise)
+        elif exercise.category == ExerciseCategory.LECTURA:
+            content.content = build_exercise_run_reading_screen(page, exercise, on_finish_exercise)
+        else:
+            nav.visible = True
+            page.show_dialog(ft.SnackBar(ft.Text("Este tipo de ejercicio todavia no esta listo")))
+            page.update()
+            return
 
-        content.content = build_exercise_run_screen(page, exercise, on_finish)
         page.update()
 
     def on_nav_change(e):
