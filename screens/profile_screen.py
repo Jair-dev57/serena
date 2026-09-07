@@ -1,6 +1,7 @@
 import flet as ft
 
 from services.db_service import get_preferences, update_preference
+from services.notifications_service import schedule_next_reminder, cancel_daily_reminder, request_permissions
 from theme import colors
 
 
@@ -17,9 +18,16 @@ def build_profile_screen(page: ft.Page) -> ft.Container:
         page.update()
 
     def build_toggle_row(icon_name: str, title: str, subtitle: str, key: str) -> ft.Container:
-        def on_toggle(e):
+        async def on_toggle(e):
             prefs[key] = e.control.value
             update_preference(key, e.control.value)
+
+            if key == "reminders":
+                if e.control.value:
+                    await request_permissions()
+                    await schedule_next_reminder(hour=20, minute=0)
+                else:
+                    await cancel_daily_reminder()
 
         return ft.Container(
             padding=ft.Padding.symmetric(vertical=10),

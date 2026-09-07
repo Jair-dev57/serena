@@ -8,9 +8,15 @@ authors = [
 requires-python = ">=3.12"
 dependencies = [
     "flet>=0.86.5",
+    "flet-android-notifications>=0.10.1",
     "flet-audio>=0.86.5",
     "flet-charts>=0.86.5",
 ]
 
 [tool.uv]
 package = false
+
+[tool.flet.android.permission]
+"android.permission.POST_NOTIFICATIONS" = true
+"android.permission.SCHEDULE_EXACT_ALARM" = true
+"android.permission.RECEIVE_BOOT_COMPLETED" = true

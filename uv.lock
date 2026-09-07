@@ -40,6 +40,18 @@ wheels = [
 ]
 
 [[package]]
+name = "flet-android-notifications"
+version = "0.10.1"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "flet" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/e3/d7/0ff4f5292b1be98188a08fae61662054d1a298d93e664cf22c6a470ef3fc/flet_android_notifications-0.10.1.tar.gz", hash = "sha256:00aaf8d79a30db744c7deaacd0fdb18270525ad93ffa70ce7648a0dfcf2d4fae", size = 26346, upload-time = "2026-09-06T13:01:57.426Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/fa/31/9c37097c86d68f117cd1f51d4ec99541cfe631a1f53a98afde5854b2b29b/flet_android_notifications-0.10.1-py3-none-any.whl", hash = "sha256:1dad00366dfac317062c13e38e038e53f6f7b6e15d14dffac487faee572c476e", size = 28880, upload-time = "2026-09-06T13:01:56.523Z" },
+]
+
+[[package]]
 name = "flet-audio"
 version = "0.86.5"
 source = { registry = "https://pypi.org/simple" }
@@ -210,6 +222,7 @@ version = "0.1.0"
 source = { virtual = "." }
 dependencies = [
     { name = "flet" },
+    { name = "flet-android-notifications" },
     { name = "flet-audio" },
     { name = "flet-charts" },
 ]
@@ -217,6 +230,7 @@ dependencies = [
 [package.metadata]
 requires-dist = [
     { name = "flet", specifier = ">=0.86.5" },
+    { name = "flet-android-notifications", specifier = ">=0.10.1" },
     { name = "flet-audio", specifier = ">=0.86.5" },
     { name = "flet-charts", specifier = ">=0.86.5" },
 ]

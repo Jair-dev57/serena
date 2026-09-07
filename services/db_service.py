@@ -269,3 +269,9 @@ def get_sessions_count_by_category(category_value: str) -> int:
     ).fetchone()[0]
     conn.close()
     return count
+
+
+def has_practiced_today() -> bool:
+    sessions = get_all_sessions()
+    today = date.today()
+    return any(s.completed_at.date() == today for s in sessions)
