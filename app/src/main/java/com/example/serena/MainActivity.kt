@@ -28,6 +28,7 @@ import com.example.serena.ui.screens.ProgressScreen
 import com.example.serena.ui.screens.ReadingScreen
 import com.example.serena.ui.screens.TalkScreen
 import com.example.serena.ui.screens.PullOutScreen
+import com.example.serena.ui.screens.VideoScanScreen
 import com.example.serena.ui.theme.BgCard
 import com.example.serena.ui.theme.BgPage
 import com.example.serena.ui.theme.BlueAccent
@@ -149,6 +150,30 @@ class MainActivity : ComponentActivity() {
                                 )
                             }
                         }
+                        ExerciseCategory.CONCIENCIACION -> VideoScanScreen(
+                            exercise = exercise,
+                            onFinish = { finished ->
+                                if (finished != null) {
+                                    scope.launch {
+                                        dao.setCompleted(finished.id, true)
+                                        db.practiceSessionDao().insert(
+                                            com.example.serena.data.PracticeSessionEntity(
+                                                exerciseId = finished.id,
+                                                completedAt = System.currentTimeMillis(),
+                                                durationMinutes = finished.durationMinutes,
+                                                fluencyScore = com.example.serena.data.ProgressCalculator.randomFluencyScore()
+                                            )
+                                        )
+                                        val prefs = db.userPreferencesDao().get()
+                                        if (prefs?.remindersEnabled == true) {
+                                            com.example.serena.ReminderScheduler.scheduleNext(applicationContext)
+                                        }
+                                        reload()
+                                    }
+                                }
+                                runningExercise = null
+                            }
+                        )
                     }
                 } else {
                     Scaffold(
@@ -265,5 +290,6 @@ fun seedExercises(): List<ExerciseEntity> = listOf(
     ExerciseEntity(name = "Inicio suave de palabra", shortName = "Inicio", description = "Suaviza el comienzo al hablar", durationMinutes = 7, difficulty = Difficulty.MEDIO, category = ExerciseCategory.HABLA, icon = "mic"),
     ExerciseEntity(name = "Conversacion guiada", shortName = "Charla", description = "Practica en una conversacion real", durationMinutes = 10, difficulty = Difficulty.RETADOR, category = ExerciseCategory.HABLA, icon = "chat_bubble"),
     ExerciseEntity(name = "Lectura con metronomo", shortName = "Metronomo", description = "Lee siguiendo un ritmo constante", durationMinutes = 8, difficulty = Difficulty.MEDIO, category = ExerciseCategory.LECTURA, icon = "graphic_eq"),
-    ExerciseEntity(name = "Pull-out", shortName = "PullOut", description = "Practica soltar la tension y deslizar el sonido en un bloqueo", durationMinutes = 6, difficulty = Difficulty.RETADOR, category = ExerciseCategory.HABLA, icon = "mic")
+    ExerciseEntity(name = "Pull-out", shortName = "PullOut", description = "Practica soltar la tension y deslizar el sonido en un bloqueo", durationMinutes = 6, difficulty = Difficulty.RETADOR, category = ExerciseCategory.HABLA, icon = "mic"),
+    ExerciseEntity(name = "Escaneo de conductas", shortName = "Escaneo", description = "Gravate y observa tus gestos y tension al hablar", durationMinutes = 3, difficulty = Difficulty.SUAVE, category = ExerciseCategory.CONCIENCIACION, icon = "mic")
 )

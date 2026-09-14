@@ -12,7 +12,8 @@ enum class Difficulty(val label: String) {
 enum class ExerciseCategory(val label: String) {
     RESPIRACION("Respiracion"),
     LECTURA("Lectura"),
-    HABLA("Habla")
+    HABLA("Habla"),
+    CONCIENCIACION("Concienciacion")
 }
 
 @Entity(tableName = "exercises")
